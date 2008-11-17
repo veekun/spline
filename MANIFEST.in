@@ -1,0 +1,3 @@
+include spline/config/deployment.ini_tmpl
+recursive-include spline/public *
+recursive-include spline/templates *
