@@ -12,7 +12,7 @@ def init_model(engine):
     #                           autoload_with=engine)
     #orm.mapper(Reflected, reflected_table)
 
-    sm = orm.sessionmaker(autoflush=True, transactional=True, bind=engine)
+    sm = orm.sessionmaker(autoflush=True, autocommit=False, bind=engine)
 
     meta.engine = engine
     meta.Session = orm.scoped_session(sm)
