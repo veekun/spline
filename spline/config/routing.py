@@ -6,10 +6,20 @@ refer to the routes manual at http://routes.groovie.org/docs/
 """
 from pylons import config
 from routes import Mapper
+from routes.util import controller_scan as dir_controller_scan
+
+def controller_scan(directory):
+    """Looks for a controller in the plugin list, defaulting to the usual
+    Routes directory scan if it isn't found."""
+
+    controllers = config['spline.plugin.controllers'].keys()
+    controllers.extend(dir_controller_scan(directory))
+    return controllers
 
 def make_map():
     """Create, configure and return the routes Mapper"""
-    map = Mapper(directory=config['pylons.paths']['controllers'],
+    map = Mapper(controller_scan=controller_scan,
+                 directory=config['pylons.paths']['controllers'],
                  always_scan=config['debug'])
     map.minimization = False
     

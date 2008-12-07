@@ -11,6 +11,16 @@ from routes.middleware import RoutesMiddleware
 
 from spline.config.environment import load_environment
 
+class SplineApp(PylonsApp):
+    def find_controller(self, controller):
+        """Controller search method that scans the plugin controller list,
+        falling back to the default Pylons way if it's not found."""
+
+        try:
+            return config['spline.plugin.controllers'][controller]
+        except KeyError:
+            return super(SplineApp, self).find_controller(controller)
+
 def make_app(global_conf, full_stack=True, **app_conf):
     """Create a Pylons WSGI application and return it
 
@@ -34,7 +44,7 @@ def make_app(global_conf, full_stack=True, **app_conf):
     load_environment(global_conf, app_conf)
 
     # The Pylons WSGI app
-    app = PylonsApp()
+    app = SplineApp()
     
     # CUSTOM MIDDLEWARE HERE (filtered by error handling middlewares)
     
