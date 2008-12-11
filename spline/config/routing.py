@@ -12,7 +12,7 @@ def controller_scan(directory):
     """Looks for a controller in the plugin list, defaulting to the usual
     Routes directory scan if it isn't found."""
 
-    controllers = config['spline.plugin.controllers'].keys()
+    controllers = config['spline.plugins.controllers'].keys()
     controllers.extend(dir_controller_scan(directory))
     return controllers
 

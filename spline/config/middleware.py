@@ -17,7 +17,7 @@ class SplineApp(PylonsApp):
         falling back to the default Pylons way if it's not found."""
 
         try:
-            return config['spline.plugin.controllers'][controller]
+            return config['spline.plugins.controllers'][controller]
         except KeyError:
             return super(SplineApp, self).find_controller(controller)
 
