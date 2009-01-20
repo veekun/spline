@@ -1,5 +1,6 @@
 """SQLAlchemy Metadata and Session object"""
 from sqlalchemy import MetaData
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 __all__ = ['Session', 'metadata']
@@ -13,3 +14,6 @@ Session = None
 # Global metadata. If you have multiple databases with overlapping table
 # names, you'll need a metadata for each database
 metadata = MetaData()
+
+# Table base class for declarative
+TableBase = declarative_base(metadata=metadata)

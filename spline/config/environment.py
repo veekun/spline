@@ -7,9 +7,10 @@ from pylons.error import handle_mako_error
 from pylons import config
 from sqlalchemy import engine_from_config
 
+from spline.config.routing import make_map
 import spline.lib.app_globals as app_globals
 import spline.lib.helpers
-from spline.config.routing import make_map
+import spline.model
 from spline.model import init_model
 
 def load_environment(global_conf, app_conf):
@@ -50,14 +51,20 @@ def load_environment(global_conf, app_conf):
     # any Pylons config options)
 
 def load_plugins(config):
-    plugins = []
+    plugins = {}
     controllers = {}
     for ep in iter_entry_points('spline.plugins'):
         plugin_class = ep.load()
         plugin = plugin_class()
-        plugins.append(plugin)
+        plugins[ep.name] = plugin
+
+        # Get list of controllers
         for name, cls in plugin.controllers().iteritems():
             controllers[name] = cls
+
+        # Get list of model classes and inject them into model module
+        for cls in plugin.model():
+            setattr(spline.model, cls.__name__, cls)
 
     config['spline.plugins'] = plugins
     config['spline.plugins.controllers'] = controllers

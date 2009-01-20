@@ -1,6 +1,8 @@
 """Setup the spline application"""
 import logging
 
+from pylons import config
+
 from spline.config.environment import load_environment
 
 log = logging.getLogger(__name__)
