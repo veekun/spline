@@ -5,9 +5,13 @@ Provides the BaseController class for subclassing.
 from pylons.controllers import WSGIController
 from pylons.templating import render_mako as render
 
+from spline.lib.plugin.load import run_hooks
 from spline.model import meta
 
 class BaseController(WSGIController):
+
+    def __before__(self, action, **params):
+        run_hooks('before_controller', action, **params)
 
     def __call__(self, environ, start_response):
         """Invoke the Controller"""
@@ -18,4 +22,3 @@ class BaseController(WSGIController):
             return WSGIController.__call__(self, environ, start_response)
         finally:
             meta.Session.remove()
-        

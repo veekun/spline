@@ -2,7 +2,6 @@
 import os
 
 from mako.lookup import TemplateLookup
-from pkg_resources import iter_entry_points
 from pylons.error import handle_mako_error
 from pylons import config
 from sqlalchemy import engine_from_config
@@ -10,6 +9,7 @@ from sqlalchemy import engine_from_config
 from spline.config.routing import make_map
 import spline.lib.app_globals as app_globals
 import spline.lib.helpers
+from spline.lib.plugin.load import load_plugins
 import spline.model
 from spline.model import init_model
 
@@ -28,7 +28,7 @@ def load_environment(global_conf, app_conf):
     config.init_app(global_conf, app_conf, package='spline', paths=paths)
 
     # Load plugins before routing so we have a list of controllers
-    load_plugins(config)
+    load_plugins()
     
     config['routes.map'] = make_map()
     config['pylons.app_globals'] = app_globals.Globals()
@@ -49,23 +49,3 @@ def load_environment(global_conf, app_conf):
 
     # CONFIGURATION OPTIONS HERE (note: all config options will override
     # any Pylons config options)
-
-def load_plugins(config):
-    plugins = {}
-    controllers = {}
-    for ep in iter_entry_points('spline.plugins'):
-        plugin_class = ep.load()
-        plugin = plugin_class()
-        plugins[ep.name] = plugin
-
-        # Get list of controllers
-        for name, cls in plugin.controllers().iteritems():
-            controllers[name] = cls
-
-        # Get list of model classes and inject them into model module
-        for cls in plugin.model():
-            setattr(spline.model, cls.__name__, cls)
-
-    config['spline.plugins'] = plugins
-    config['spline.plugins.controllers'] = controllers
-
