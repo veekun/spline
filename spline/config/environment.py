@@ -9,7 +9,7 @@ from sqlalchemy import engine_from_config
 from spline.config.routing import make_map
 import spline.lib.app_globals as app_globals
 import spline.lib.helpers
-from spline.lib.plugin.load import load_plugins
+from spline.lib.plugin.load import load_plugins, run_hooks
 import spline.model
 from spline.model import init_model
 
@@ -49,3 +49,6 @@ def load_environment(global_conf, app_conf):
 
     # CONFIGURATION OPTIONS HERE (note: all config options will override
     # any Pylons config options)
+
+    # Let plugins do any final setup
+    run_hooks('after_setup')

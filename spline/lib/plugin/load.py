@@ -42,17 +42,22 @@ def load_plugins():
     config['spline.plugins.controllers'] = controllers
     config['spline.plugins.hooks'] = hooks
 
-def run_hooks(name, *args, **kwargs):
+# Arg name is designed to be unlikely to collide with any arbitrary kwarg
+def run_hooks(_spline_hook_name, *args, **kwargs):
     """Runs the hooks registered for the given name, in priority order, passing
     along all other arguments.
+
+    Current hooks:
+    before_controller   -- immediately before any controller is run
+    after_setup         -- immediately following the Pylons environment setup
     """
 
     all_hooks = config['spline.plugins.hooks']
 
-    if not name in all_hooks:
+    if not _spline_hook_name in all_hooks:
         # No hooks; bail
         return
-    hooks = all_hooks[name]
+    hooks = all_hooks[_spline_hook_name]
 
     for priority in [1, 2, 3, 4, 5]:
         if not priority in hooks:
