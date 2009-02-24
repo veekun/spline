@@ -12,6 +12,10 @@ class PluginBase(object):
         """Returns a dictionary mapping routing names to controllers."""
         return {}
 
+    def template_dirs(self):
+        """Returns a list of directories containing templates."""
+        return []
+
     def model(self):
         """Returns a list of classes to stick in Spline's model namespace.
 

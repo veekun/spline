@@ -8,13 +8,17 @@ from pylons import config
 
 import spline.model
 
-def load_plugins():
+def load_plugins(paths):
     """Loads all available plugins and sticks the configuration they offer into
     `spline.plugins.*` keys in the given config dictionary.
+
+    `paths` is the Pylons setup path dictionary; we need this to be able to add
+    to search paths, but this function must be called after the app is setup.
     """
 
     plugins = {}        # plugin_name => plugin
     controllers = {}    # controller_name => controller
+    template_dirs = []  # directories
     hooks = {}          # hook_name => { priority => [functions] }
     for ep in iter_entry_points('spline.plugins'):
         plugin_class = ep.load()
@@ -24,6 +28,9 @@ def load_plugins():
         # Get list of controllers
         for name, cls in plugin.controllers().iteritems():
             controllers[name] = cls
+
+        # Get list of templates and add them to the template lookup list
+        template_dirs.extend(plugin.template_dirs())
 
         # Get list of model classes and inject them into model module
         for cls in plugin.model():
@@ -41,6 +48,8 @@ def load_plugins():
     config['spline.plugins'] = plugins
     config['spline.plugins.controllers'] = controllers
     config['spline.plugins.hooks'] = hooks
+
+    paths['templates'] = template_dirs + paths['templates']
 
 # Arg name is designed to be unlikely to collide with any arbitrary kwarg
 def run_hooks(_spline_hook_name, *args, **kwargs):

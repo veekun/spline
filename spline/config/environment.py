@@ -28,7 +28,7 @@ def load_environment(global_conf, app_conf):
     config.init_app(global_conf, app_conf, package='spline', paths=paths)
 
     # Load plugins before routing so we have a list of controllers
-    load_plugins()
+    load_plugins(paths)
     
     config['routes.map'] = make_map()
     config['pylons.app_globals'] = app_globals.Globals()
