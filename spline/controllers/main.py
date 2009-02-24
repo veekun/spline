@@ -8,7 +8,12 @@ from spline.lib.base import BaseController, render
 
 log = logging.getLogger(__name__)
 
-class IndexController(BaseController):
+class MainController(BaseController):
 
     def index(self):
         return render('/index.mako')
+
+    def css(self):
+        # TODO: turn this into a cached concatenation of all CSS
+        response.headers['Content-type'] = 'text/css; charset=utf-8'
+        return render('/css/main.mako')
