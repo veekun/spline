@@ -1,5 +1,3 @@
-<%include file="reset.mako"/>
-
 /*** Base page elements ***/
 
 /* Display */
