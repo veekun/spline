@@ -8,6 +8,8 @@ from pylons import config
 from routes import Mapper
 from routes.util import controller_scan as dir_controller_scan
 
+from spline.lib.plugin.load import run_hooks
+
 def controller_scan(directory):
     """Looks for a controller in the plugin list, defaulting to the usual
     Routes directory scan if it isn't found."""
@@ -29,6 +31,9 @@ def make_map():
     map.connect('/error/{action}/{id}', controller='error')
 
     map.connect('/css', controller='main', action='css')
+
+    # Allow plugins to map routes without the below defaults clobbering them
+    run_hooks('routes_mapping', map=map)
 
     # Reasonable defaults; may or may not hang around
     map.connect('/', controller='main', action='index')

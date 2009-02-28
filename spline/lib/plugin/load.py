@@ -57,8 +57,10 @@ def run_hooks(_spline_hook_name, *args, **kwargs):
     along all other arguments.
 
     Current hooks:
-    before_controller   -- immediately before any controller is run
-    after_setup         -- immediately following the Pylons environment setup
+    before_controller   immediately before any controller is run
+    after_setup         immediately following the Pylons environment setup
+    routes_mapping      near the end of Routes mapping, just before default
+                        routes are defined
     """
 
     all_hooks = config['spline.plugins.hooks']
