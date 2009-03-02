@@ -31,7 +31,8 @@ class MainController(BaseController):
                 (whatever, css_file) = os.path.split(css_path)
                 css_files.add(css_file)
 
-        full_stylesheet = ''
+        css_files.discard('reset.mako')
+        full_stylesheet = render('/css/reset.mako')
         for css_file in sorted(css_files):
             full_stylesheet += render("/css/%s" % css_file)
 
