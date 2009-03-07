@@ -1,5 +1,9 @@
 /*** Base page elements ***/
 
+/* Base font.  This is a load of crap.  Why can't everyone have a default
+ * browser font they actually want to see?  Fuck fuck fuckity fuck IE. */
+body { font-family: DejaVu Sans, Verdana, sans-serif; font-size: 12px; }
+
 /* Display */
 body { background: #ddd; }
 #header, #menu, #content, #footer { padding: 1em; }
@@ -26,7 +30,8 @@ img { vertical-align: middle; }
 
 /* Definition lists via floats */
 dl { overflow: hidden /* new float context */; }
-dt { float: left; clear: left; width: 10em; }
+dt { float: left; clear: left; width: 11.5em; margin-right: 0.5em; text-align: right; color: #2457a0; }
+dt:after { content: ':'; }
+dd { padding-left: 12em /* float width, so hover highlight includes dt but lines wrap correctly */; }
 dd:after { content: 'float clear'; display: block; clear: both; height: 0; visibility: hidden; }
 dt, dd { line-height: 1.33; }
-dt:hover + dd, dd:hover { background: #e8e8e8; }
