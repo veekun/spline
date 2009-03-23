@@ -26,6 +26,10 @@ body { background: #ddd; }
 h1 { font-size: 2em; margin: 0.5em 0 0.25em 0 /* 1em 0 0.5em 0 */; padding-bottom: 0.125em /* 0.25em */; border-bottom: 1px solid #2457a0; color: #2457a0; }
 h2 { font-size: 1.67em; margin: 0.6em 0 0.3em 0 /* 1em 0 0.5em 0 */; color: #2457a0; }
 
+table th, table td { padding: 0.25em; }
+table th { font-weight: normal; color: #2457a0; }
+table tr.header-row th { border-bottom: 1px solid #2457a0; background: #c6d8f2; color: black; }
+
 img { vertical-align: middle; }
 
 /* Definition lists via floats */
