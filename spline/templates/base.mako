@@ -3,6 +3,10 @@
 <head>
     <title>${self.title()}</title>
     <link rel="stylesheet" type="text/css" href="${h.url_for(controller='main', action='css')}">
+## XXX Should this be done for CSS, too?
+    % for script in c.javascripts:
+    <script type="text/javascript" src="/script/${script}.js"></script>
+    % endfor
 </head>
 <body>
 <div id="header">
@@ -17,7 +21,6 @@
     % endif
     </div>
     % endif
-
 </div>
 ## I hate wrapper divs, but these allow for some very nice layout.
 ## #content is used for columns; +padding, -margin, overflow: hidden.

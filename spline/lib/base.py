@@ -2,6 +2,7 @@
 
 Provides the BaseController class for subclassing.
 """
+from pylons import c
 from pylons.controllers import WSGIController
 from pylons.templating import render_mako as render
 
@@ -11,6 +12,7 @@ from spline.model import meta
 class BaseController(WSGIController):
 
     def __before__(self, action, **params):
+        c.javascripts = ['lib/jquery-1.3.2.min']
         run_hooks('before_controller', action, **params)
 
     def __call__(self, environ, start_response):

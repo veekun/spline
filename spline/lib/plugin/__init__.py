@@ -16,6 +16,10 @@ class PluginBase(object):
         """Returns a list of directories containing templates."""
         return []
 
+    def static_dirs(self):
+        """Returns a list of directories containing static files."""
+        return []
+
     def model(self):
         """Returns a list of classes to stick in Spline's model namespace.
 

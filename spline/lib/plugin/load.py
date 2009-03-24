@@ -19,6 +19,7 @@ def load_plugins(paths):
     plugins = {}        # plugin_name => plugin
     controllers = {}    # controller_name => controller
     template_dirs = []  # directories
+    static_dirs = []    # directories
     hooks = {}          # hook_name => { priority => [functions] }
     for ep in iter_entry_points('spline.plugins'):
         plugin_class = ep.load()
@@ -29,8 +30,9 @@ def load_plugins(paths):
         for name, cls in plugin.controllers().iteritems():
             controllers[name] = cls
 
-        # Get list of templates and add them to the template lookup list
+        # Get lists of dirs and add them to the appropriate lookup list
         template_dirs.extend(plugin.template_dirs())
+        static_dirs.extend(plugin.static_dirs())
 
         # Get list of model classes and inject them into model module
         for cls in plugin.model():
@@ -50,6 +52,7 @@ def load_plugins(paths):
     config['spline.plugins.hooks'] = hooks
 
     paths['templates'] = template_dirs + paths['templates']
+    paths['static_files'] = static_dirs + paths['static_files']
 
 # Arg name is designed to be unlikely to collide with any arbitrary kwarg
 def run_hooks(_spline_hook_name, *args, **kwargs):
