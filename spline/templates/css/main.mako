@@ -32,6 +32,11 @@ table tr.header-row th { border-bottom: 1px solid #2457a0; background: #c6d8f2; 
 
 img { vertical-align: middle; }
 
+form {}
+input[type='text'].error { background-color: #f2c6d8; }
+
+.faded { opacity: 0.33; }
+
 /* Definition lists via floats */
 dl { overflow: hidden /* new float context */; }
 dt { float: left; clear: left; width: 11.5em; margin-right: 0.5em; text-align: right; color: #2457a0; }
