@@ -50,5 +50,8 @@ def load_environment(global_conf, app_conf):
     # CONFIGURATION OPTIONS HERE (note: all config options will override
     # any Pylons config options)
 
+    # Use strict templating; none of this default-to-empty-string nonsense
+    config['pylons.strict_c'] = True
+
     # Let plugins do any final setup
     run_hooks('after_setup')
