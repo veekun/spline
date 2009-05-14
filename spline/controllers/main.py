@@ -26,14 +26,16 @@ class MainController(BaseController):
         # list of UNIQUE filenames by using a set
         css_files = set()
 
-        for directory in config['pylons.app_globals'].mako_lookup.directories:
+        # Go backwards through the list so we hit the higher-priority templates
+        # LAST; this lets them override lower-priority style rules, as expected
+        longass_key = 'spline.plugins.template_directories'
+        for directory in reversed(config[longass_key]):
             for css_path in glob(os.path.join(directory, 'css', '*.mako')):
                 (whatever, css_file) = os.path.split(css_path)
                 css_files.add(css_file)
 
-        css_files.discard('reset.mako')
-        full_stylesheet = render('/css/reset.mako')
+        stylesheets = []
         for css_file in sorted(css_files):
-            full_stylesheet += render("/css/%s" % css_file)
+            stylesheets.append(render("/css/%s" % css_file))
 
-        return full_stylesheet
+        return '\n'.join(stylesheets)
