@@ -1,4 +1,5 @@
 """Functionality generally needed to build a plugin."""
+import os.path
 
 class PluginBase(object):
     """Base object for spline plugins.  Plugins should advertise a subclass of
@@ -13,7 +14,10 @@ class PluginBase(object):
         return {}
 
     def template_dirs(self):
-        """Returns a list of directories containing templates."""
+        """Returns a list of directories containing templates.
+
+        Each element of this list should be a tuple of (directory, priority).
+        """
         return []
 
     def static_dirs(self):
@@ -40,4 +44,44 @@ class PluginBase(object):
         hook.
         """
 
+        return []
+
+
+class DeploymentPlugin(PluginBase):
+    """A pseudo-plugin created from a deployment directory.  It examines the
+    deployment dir for appropriately-named subdirectories containing static
+    data and returns them from the appropriate methods.
+    """
+
+    # TODO that 'examine' bit could stand to be true
+
+    def __init__(self, root_dir):
+        """This can't call super() as it changes the signature.  Whatever."""
+        self.root_dir = root_dir
+
+    def controllers(self):
+        """Deployment probably shouldn't be running new code; that should be in
+        a real plugin.  Also, the namespace would be all wrong.
+        """
+        # TODO make this possible somehow in a controllers/ dir?
+        return {}
+
+    def template_dirs(self):
+        return [
+            (os.path.join(self.root_dir, 'templates'), 1)
+        ]
+
+    def static_dirs(self):
+        return [ os.path.join(self.root_dir, 'public') ]
+
+    def model(self):
+        """No way!"""
+        return []
+
+    def hooks(self):
+        """Not yet.
+
+        More reasonable than entire controllers; they could be put in a special
+        hooks.py file and loaded/inspected by this class.
+        """
         return []

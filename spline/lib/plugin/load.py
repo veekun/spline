@@ -8,12 +8,15 @@ from pylons import config
 
 import spline.model
 
-def load_plugins(paths):
+def load_plugins(paths, extra_plugins=[]):
     """Loads all available plugins and sticks the configuration they offer into
     `spline.plugins.*` keys in the given config dictionary.
 
     `paths` is the Pylons setup path dictionary; we need this to be able to add
     to search paths, but this function must be called after the app is setup.
+
+    `extra_plugins` is an optional list of previously-instantiated plugin
+    objects that will be loaded after the others.
     """
 
     plugins = {}          # plugin_name => plugin
@@ -21,11 +24,18 @@ def load_plugins(paths):
     template_tuples = []  # (directory, priority)
     static_dirs = []      # directories
     hooks = {}            # hook_name => { priority => [functions] }
+
+    all_plugins = []
     for ep in iter_entry_points('spline.plugins'):
         plugin_class = ep.load()
         plugin = plugin_class()
         plugins[ep.name] = plugin
 
+        all_plugins.append(plugin)
+
+    all_plugins.extend(extra_plugins)
+
+    for plugin in all_plugins:
         # Get list of controllers
         for name, cls in plugin.controllers().iteritems():
             controllers[name] = cls
