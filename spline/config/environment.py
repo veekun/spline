@@ -9,7 +9,7 @@ from sqlalchemy import engine_from_config
 from spline.config.routing import make_map
 import spline.lib.app_globals as app_globals
 import spline.lib.helpers
-from spline.lib.plugin import DeploymentPlugin
+from spline.lib.plugin import InstancePlugin
 from spline.lib.plugin.load import load_plugins, run_hooks
 import spline.model
 from spline.model import init_model
@@ -30,10 +30,10 @@ def load_environment(global_conf, app_conf):
 
     # Create a fake plugin from the config dir if it's not the dir the core
     # spline code is running from
-    extra_plugins = []
+    extra_plugins = {}
     config_dir = os.path.dirname(global_conf['__file__'])
     if config_dir != root:
-        extra_plugins.append(DeploymentPlugin(config_dir))
+        extra_plugins['__instance__'] = InstancePlugin(config_dir)
 
     # Load plugins before routing so we have a list of controllers
     load_plugins(paths, extra_plugins)

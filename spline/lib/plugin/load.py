@@ -8,15 +8,16 @@ from pylons import config
 
 import spline.model
 
-def load_plugins(paths, extra_plugins=[]):
+def load_plugins(paths, extra_plugins={}):
     """Loads all available plugins and sticks the configuration they offer into
     `spline.plugins.*` keys in the given config dictionary.
 
     `paths` is the Pylons setup path dictionary; we need this to be able to add
     to search paths, but this function must be called after the app is setup.
 
-    `extra_plugins` is an optional list of previously-instantiated plugin
-    objects that will be loaded after the others.
+    `extra_plugins` is an optional dict of previously-instantiated plugin
+    objects that will be loaded after the others, with the keys as the plugin
+    names.
     """
 
     plugins = {}          # plugin_name => plugin
@@ -25,17 +26,14 @@ def load_plugins(paths, extra_plugins=[]):
     static_dirs = []      # directories
     hooks = {}            # hook_name => { priority => [functions] }
 
-    all_plugins = []
+    plugins.update(extra_plugins)
+
     for ep in iter_entry_points('spline.plugins'):
         plugin_class = ep.load()
         plugin = plugin_class()
         plugins[ep.name] = plugin
 
-        all_plugins.append(plugin)
-
-    all_plugins.extend(extra_plugins)
-
-    for plugin in all_plugins:
+    for plugin in plugins.values():
         # Get list of controllers
         for name, cls in plugin.controllers().iteritems():
             controllers[name] = cls
@@ -58,10 +56,6 @@ def load_plugins(paths, extra_plugins=[]):
             hooks[name][priority].append(function)
 
     # Spline builtin templates have normal priority: 3
-    # XXX NOTE BRO:
-    # the template search order has to make sure high-priority things are found FIRST
-    # but the css load order has to put high-priority things LAST so they override older things
-    # ok?  ok.
     for directory in paths['templates']:
         template_tuples.append((directory, 3))
     # Extract the list of template directories in order, remembering that lower

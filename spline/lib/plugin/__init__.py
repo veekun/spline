@@ -47,9 +47,9 @@ class PluginBase(object):
         return []
 
 
-class DeploymentPlugin(PluginBase):
-    """A pseudo-plugin created from a deployment directory.  It examines the
-    deployment dir for appropriately-named subdirectories containing static
+class InstancePlugin(PluginBase):
+    """A pseudo-plugin created from an instance directory.  It examines the
+    instance dir for appropriately-named subdirectories containing static
     data and returns them from the appropriate methods.
     """
 
@@ -60,7 +60,7 @@ class DeploymentPlugin(PluginBase):
         self.root_dir = root_dir
 
     def controllers(self):
-        """Deployment probably shouldn't be running new code; that should be in
+        """Instances probably shouldn't be running new code; that should be in
         a real plugin.  Also, the namespace would be all wrong.
         """
         # TODO make this possible somehow in a controllers/ dir?
