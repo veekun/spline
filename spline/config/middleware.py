@@ -1,5 +1,6 @@
 """Pylons middleware initialization"""
 from beaker.middleware import CacheMiddleware, SessionMiddleware
+from paste import request as paste_request
 from paste.cascade import Cascade
 from paste.registry import RegistryManager
 from paste.urlparser import StaticURLParser
@@ -20,6 +21,45 @@ class SplineApp(PylonsApp):
             return config['spline.plugins.controllers'][controller]
         except KeyError:
             return super(SplineApp, self).find_controller(controller)
+
+class SplineStaticURLParser(object):
+    """Creates a URL parser that handles finding any plugin's static files.
+
+    Assumes URLs to static files are of the form /static/:plugin_name/:uri.
+    """
+
+    def __init__(self, static_paths={}):
+        """Constructor.
+
+        static_paths -- a dictionary mapping plugin identifiers (used in static
+            file URIs) to the paths where those plugins' static files reside
+        """
+
+        self.static_paths = static_paths
+        self.url_parsers = {}
+        for plugin_name, path in self.static_paths.items():
+            self.url_parsers[plugin_name] = StaticURLParser(path)
+
+        if not 'spline' in self.url_parsers:
+            raise ValueError("A default 'spline' static path is required.")
+
+        self.default_parser = self.url_parsers['spline']
+
+    def __call__(self, environ, start_response):
+        """The meat of this operation.  Dispatches to the StaticURLParser for
+        the plugin named in the URL.
+        """
+
+        # Need to match /static/:plugin_name/
+        path_static = paste_request.path_info_pop(environ)
+        if path_static != 'static':
+            return self.default_parser.not_found(environ, start_response)
+
+        plugin_name = paste_request.path_info_pop(environ)
+        if plugin_name not in self.url_parsers:
+            return self.default_parser.not_found(environ, start_response)
+
+        return self.url_parsers[plugin_name](environ, start_response)
 
 def make_app(global_conf, full_stack=True, **app_conf):
     """Create a Pylons WSGI application and return it
@@ -69,7 +109,6 @@ def make_app(global_conf, full_stack=True, **app_conf):
 
     # Static files (If running in production, and Apache or another web 
     # server is handling this static content, remove the following 2 lines)
-    static_apps = [StaticURLParser(path)
-                   for path in config['pylons.paths']['static_files']]
-    app = Cascade(static_apps + [app])
+    static_app = SplineStaticURLParser(config['pylons.paths']['static_files'])
+    app = Cascade([static_app, app])
     return app

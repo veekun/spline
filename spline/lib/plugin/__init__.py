@@ -20,9 +20,9 @@ class PluginBase(object):
         """
         return []
 
-    def static_dirs(self):
-        """Returns a list of directories containing static files."""
-        return []
+    def static_dir(self):
+        """Returns a directory containing static files."""
+        return None
 
     def model(self):
         """Returns a list of classes to stick in Spline's model namespace.
@@ -71,8 +71,8 @@ class InstancePlugin(PluginBase):
             (os.path.join(self.root_dir, 'templates'), 1)
         ]
 
-    def static_dirs(self):
-        return [ os.path.join(self.root_dir, 'public') ]
+    def static_dir(self):
+        return os.path.join(self.root_dir, 'public')
 
     def model(self):
         """No way!"""

@@ -22,7 +22,7 @@ def load_environment(global_conf, app_conf):
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     paths = dict(root=root,
                  controllers=os.path.join(root, 'controllers'),
-                 static_files=[os.path.join(root, 'public')],
+                 static_files={},
                  templates=[os.path.join(root, 'templates')])
 
     # Initialize config with the basic options
@@ -37,6 +37,8 @@ def load_environment(global_conf, app_conf):
 
     # Load plugins before routing so we have a list of controllers
     load_plugins(paths, extra_plugins)
+    # Add our static directory
+    paths['static_files']['spline'] = os.path.join(root, 'public')
     
     config['routes.map'] = make_map()
     config['pylons.app_globals'] = app_globals.Globals()
