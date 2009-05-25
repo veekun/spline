@@ -33,7 +33,7 @@ def load_environment(global_conf, app_conf):
     extra_plugins = {}
     config_dir = os.path.dirname(global_conf['__file__'])
     if config_dir != root:
-        extra_plugins['__instance__'] = InstancePlugin(config_dir)
+        extra_plugins['spline.instance'] = InstancePlugin(config_dir)
 
     # Load plugins before routing so we have a list of controllers
     load_plugins(paths, extra_plugins)

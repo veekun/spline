@@ -21,7 +21,7 @@ class PluginBase(object):
         return []
 
     def static_dir(self):
-        """Returns a directory containing static files."""
+        """Returns a directory containing static files, or None for none."""
         return None
 
     def model(self):
