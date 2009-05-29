@@ -1,5 +1,3 @@
-/*** Base page elements ***/
-
 /* Base font.  This is a load of crap.  Why can't everyone have a default
  * browser font they actually want to see?  Fuck fuck fuckity fuck IE. */
 body { font-family: DejaVu Sans, Verdana, sans-serif; font-size: 12px; }
@@ -21,6 +19,8 @@ body { background: #ddd; }
 /* Layout: equal-height columns */
 #body { overflow: hidden; }
 #menu, #content { padding-bottom: 1004em; margin-bottom: -1000em; }
+
+/*** Base page elements ***/
 
 /* Basics */
 h1 { font-size: 2em; margin: 0.5em 0 0.25em 0 /* 1em 0 0.5em 0 */; padding-bottom: 0.125em /* 0.25em */; border-bottom: 1px solid #2457a0; color: #2457a0; }
