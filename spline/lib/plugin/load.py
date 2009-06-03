@@ -3,7 +3,6 @@ Plugins themselves should never need to touch anything in this module!
 """
 
 from pkg_resources import iter_entry_points
-
 from pylons import config
 
 import spline.model
@@ -25,6 +24,7 @@ def load_plugins(paths, extra_plugins={}):
     template_tuples = []  # (directory, priority)
     static_dirs = {}      # directories
     hooks = {}            # hook_name => { priority => [functions] }
+    widgets = {}          # widget_name => { priority => [template_paths] }
 
     plugins.update(extra_plugins)
 
@@ -62,6 +62,15 @@ def load_plugins(paths, extra_plugins={}):
 
             hooks[name][priority].append(function)
 
+        # Register some template hooks^Wwidgets
+        for name, priority, path in plugin.widgets():
+            if not name in widgets:
+                widgets[name] = {}
+            if not priority in widgets[name]:
+                widgets[name][priority] = []
+
+            widgets[name][priority].append(path)
+
     # Spline builtin templates have normal priority: 3
     for directory in paths['templates']:
         template_tuples.append((directory, 3))
@@ -74,10 +83,12 @@ def load_plugins(paths, extra_plugins={}):
     config['spline.plugins'] = plugins
     config['spline.plugins.controllers'] = controllers
     config['spline.plugins.hooks'] = hooks
+    config['spline.plugins.widgets'] = widgets
     config['spline.plugins.template_directories'] = template_dirs
 
     paths['templates'] = template_dirs  # already includes defaults
     paths['static_files'].update(static_dirs)
+
 
 # Arg name is designed to be unlikely to collide with any arbitrary kwarg
 def run_hooks(_spline_hook_name, *args, **kwargs):
@@ -107,4 +118,3 @@ def run_hooks(_spline_hook_name, *args, **kwargs):
             function(*args, **kwargs)
 
     return
-

@@ -36,12 +36,34 @@ class PluginBase(object):
     def hooks(self):
         """Returns a list of tuples in the form `(hook_name, priority, function)`.
 
+        A hook is a named point within Python code that allows plugins to
+        inject their own code; for example, there is a `before_controller` hook
+        that plugins can use to execute code before each controller call.  The
+        `users` plugin uses this to check the session for a logged-in user on
+        each request.
+
         `hook_name` is a string identifying a hook somewhere in either Spline
         core or another plugin.
         `priority` is a number from 1 to 5 using Apache conventions: 3 is
         normal, 2/4 are first/last, 1/5 are REALLY first/last.
         `function` is the function you want to be called.  Arguments vary by
         hook.
+        """
+
+        return []
+
+    def widgets(self):
+        """Returns a list of tuples in the form `(widget_name, priority, template_path)`.
+
+        A widget is similar to a hook, except it's a Mako template rather than
+        a Python function.
+
+        `widget_name` is a string identifying a template hook somewhere in
+        either Spline core or another plugin.
+        `priority` is a number from 1 to 5 using Apache conventions: 3 is
+        normal, 2/4 are first/last, 1/5 are REALLY first/last.
+        `template_path` is the path to a template containing this widget.
+        Arguments vary by hook.
         """
 
         return []
@@ -72,6 +94,7 @@ class InstancePlugin(PluginBase):
         ]
 
     def static_dir(self):
+        """Assumed to be a directory named `public`."""
         return os.path.join(self.root_dir, 'public')
 
     def model(self):
@@ -85,3 +108,37 @@ class InstancePlugin(PluginBase):
         hooks.py file and loaded/inspected by this class.
         """
         return []
+
+    def widgets(self):
+        """The contents of a `widgets` directory become widgets.  Files are
+        associated with the widget hook matching the filename.  Subdirectories'
+        contents are all associated with the widget hook matching the name of
+        the subdirectory.
+        """
+
+        widget_files = []
+        # XXX This sucks and is going to lead to so many fucking collisions
+        widget_dir = os.path.join(self.root_dir, 'templates', 'widgets')
+        if not os.path.isdir(widget_dir):
+            # Directory missing or bogus; no widgets
+            return []
+
+        for candidate in os.listdir(widget_dir):
+            candidate_path = os.path.join(widget_dir, candidate)
+            if os.path.isdir(candidate_path):
+                # Directory: add every file inside
+                for widget_file in os.path.listdir(candidate_path):
+                    widget_path = os.path.join(candidate_path, widget)
+                    if os.path.isfile(widget_path):
+                        widget_files.append(widget_path)
+            else:
+                # Single file
+                widget_files.append(candidate)
+
+        widgets = []
+        for widget_path in widget_files:
+            whatever, widget_file = os.path.split(widget_path)
+            widget, whatever = os.path.splitext(widget_file)
+            widgets.append( (widget, 3, '/widgets/%s' % widget_path) )
+
+        return widgets

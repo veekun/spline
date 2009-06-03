@@ -21,6 +21,7 @@
     % endif
     </div>
     % endif
+    <%include file="/widgets.mako" args="widget='page_header'"/>
 </div>
 ## I hate wrapper divs, but these allow for some very nice layout.
 ## #content is used for columns; +padding, -margin, overflow: hidden.
