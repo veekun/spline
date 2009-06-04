@@ -69,13 +69,11 @@ class PluginBase(object):
         return []
 
 
-class InstancePlugin(PluginBase):
+class LocalPlugin(PluginBase):
     """A pseudo-plugin created from an instance directory.  It examines the
-    instance dir for appropriately-named subdirectories containing static
-    data and returns them from the appropriate methods.
+    directory for appropriately-named subdirectories containing static data and
+    returns them from the appropriate methods.
     """
-
-    # TODO that 'examine' bit could stand to be true
 
     def __init__(self, root_dir):
         """This can't call super() as it changes the signature.  Whatever."""

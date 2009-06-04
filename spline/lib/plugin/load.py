@@ -31,8 +31,9 @@ def load_plugins(paths, extra_plugins={}):
     for ep in iter_entry_points('spline.plugins'):
         plugin_class = ep.load()
 
-        if ep.name[0:7] == 'spline':
-            raise ValueError("Plugin names beginning with 'spline' are reserved.")
+        if ep.name[0:7] == 'spline' or ep.name == 'local':
+            raise ValueError("'local' and all names starting with 'spline' are"
+                             " reserved.")
 
         plugin = plugin_class()
         plugins[ep.name] = plugin
