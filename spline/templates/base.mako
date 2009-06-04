@@ -3,9 +3,8 @@
 <head>
     <title>${self.title()}</title>
     <link rel="stylesheet" type="text/css" href="${h.url_for(controller='main', action='css')}">
-## XXX Should this be done for CSS, too?
-    % for script in c.javascripts:
-    <script type="text/javascript" src="/script/${script}.js"></script>
+    % for plugin, script in c.javascripts:
+    <script type="text/javascript" src="${h.static_uri(plugin, 'script/%s.js' % script)}"></script>
     % endfor
 </head>
 <body>
