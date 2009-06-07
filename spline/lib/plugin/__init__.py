@@ -121,22 +121,23 @@ class LocalPlugin(PluginBase):
             # Directory missing or bogus; no widgets
             return []
 
-        for candidate in os.listdir(widget_dir):
-            candidate_path = os.path.join(widget_dir, candidate)
+        widgets = []
+        for candidate_file in os.listdir(widget_dir):
+            candidate_path = os.path.join(widget_dir, candidate_file)
             if os.path.isdir(candidate_path):
                 # Directory: add every file inside
                 for widget_file in os.listdir(candidate_path):
-                    widget_path = os.path.join(candidate_path, widget)
+                    widget_path = os.path.join(candidate_path, widget_file)
                     if os.path.isfile(widget_path):
-                        widget_files.append(widget_path)
+                        basename, whatever = os.path.splitext(widget_file)
+                        widgets.append( (
+                            candidate_file,
+                            3,
+                            '/widgets/%s/%s' % (candidate_file, widget_file)
+                        ) )
             else:
                 # Single file
-                widget_files.append(candidate)
-
-        widgets = []
-        for widget_path in widget_files:
-            whatever, widget_file = os.path.split(widget_path)
-            widget, whatever = os.path.splitext(widget_file)
-            widgets.append( (widget, 3, '/widgets/%s' % widget_path) )
+                widget, whatever = os.path.splitext(widget_file)
+                widgets.append( (widget, 3, '/widgets/%s' % candidate_file) )
 
         return widgets
