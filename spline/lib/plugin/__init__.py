@@ -125,7 +125,7 @@ class LocalPlugin(PluginBase):
             candidate_path = os.path.join(widget_dir, candidate)
             if os.path.isdir(candidate_path):
                 # Directory: add every file inside
-                for widget_file in os.path.listdir(candidate_path):
+                for widget_file in os.listdir(candidate_path):
                     widget_path = os.path.join(candidate_path, widget)
                     if os.path.isfile(widget_path):
                         widget_files.append(widget_path)
