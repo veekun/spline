@@ -24,3 +24,4 @@ class BaseController(WSGIController):
             return WSGIController.__call__(self, environ, start_response)
         finally:
             meta.Session.remove()
+            run_hooks('after_controller')
