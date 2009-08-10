@@ -23,6 +23,7 @@ def load_environment(global_conf, app_conf):
     paths = dict(root=root,
                  controllers=os.path.join(root, 'controllers'),
                  static_files={},
+                 content_files=[],
                  templates=[os.path.join(root, 'templates')])
 
     # Initialize config with the basic options
@@ -40,7 +41,7 @@ def load_environment(global_conf, app_conf):
     # Add our static directory
     paths['static_files']['spline'] = os.path.join(root, 'public')
     
-    config['routes.map'] = make_map()
+    config['routes.map'] = make_map(content_dirs=paths['content_files'])
     config['pylons.app_globals'] = app_globals.Globals()
     config['pylons.h'] = spline.lib.helpers
 

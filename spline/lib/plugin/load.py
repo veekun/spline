@@ -22,7 +22,8 @@ def load_plugins(paths, extra_plugins={}):
     plugins = {}          # plugin_name => plugin
     controllers = {}      # controller_name => controller
     template_tuples = []  # (directory, priority)
-    static_dirs = {}      # directories
+    static_dirs = {}      # plugin_name => directory
+    content_dirs = []     # directories
     hooks = {}            # hook_name => { priority => [functions] }
     widgets = {}          # widget_name => { priority => [template_paths] }
 
@@ -49,6 +50,10 @@ def load_plugins(paths, extra_plugins={}):
         static_dir = plugin.static_dir()
         if static_dir is not None:
             static_dirs[plugin_name] = static_dir
+
+        content_dir = plugin.content_dir()
+        if content_dir is not None:
+            content_dirs.append(content_dir)
 
         # Get list of model classes and inject them into model module
         for cls in plugin.model():
@@ -89,6 +94,7 @@ def load_plugins(paths, extra_plugins={}):
 
     paths['templates'] = template_dirs  # already includes defaults
     paths['static_files'].update(static_dirs)
+    paths['content_files'].extend(content_dirs)
 
 
 # Arg name is designed to be unlikely to collide with any arbitrary kwarg

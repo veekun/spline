@@ -24,6 +24,10 @@ class PluginBase(object):
         """Returns a directory containing static files, or None for none."""
         return None
 
+    def content_dir(self):
+        """Returns a directory containing content files, or None for none."""
+        return None
+
     def model(self):
         """Returns a list of classes to stick in Spline's model namespace.
 

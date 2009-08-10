@@ -34,7 +34,7 @@
 <!-- Commenting this out until I know how menus are gonna work at all
  <div id="menu">
     <ul>
-    <li><a href="${h.url_for(controller='main', action='index')}">Home</a></li>
+##    <li><a href="${h.url_for(controller='main', action='index')}">Home</a></li>
     </ul>
  </div>
 -->

@@ -14,7 +14,7 @@ def static_uri(plugin_name, path):
     Returns a full URI to the given file, as owned by the named plugin.
     """
 
-    root_url = url_for(controller='main', action='index')
+    root_url = url_for('/')
     return "%sstatic/%s/%s" % (root_url, plugin_name, path)
 
 # Import helpers as desired, or define your own, ie:

@@ -15,6 +15,7 @@ class MainController(BaseController):
     def index(self):
         return render('/index.mako')
 
+
     def css(self):
         """Returns all the CSS in every plugin, concatenated."""
         # This solution sucks donkey balls, but it's marginally better than
@@ -39,3 +40,12 @@ class MainController(BaseController):
             stylesheets.append(render("/css/%s" % css_file))
 
         return '\n'.join(stylesheets)
+
+
+    def content(self, path):
+        """Handles returning "content" files: static content shoved more or
+        less verbatim into the wrapper.
+        """
+        f = open(path, 'r')
+        c.content = f.read()
+        return render('/content.mako')
