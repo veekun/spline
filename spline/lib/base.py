@@ -12,6 +12,18 @@ from spline.model import meta
 class BaseController(WSGIController):
 
     def __before__(self, action, **params):
+        c.links = [
+            ('Menu', dict(controller='main', action='index'), [
+                ('Plugin 1', dict(controller='main', action='index'), [
+                    ('foo', dict(controller='main', action='index'), []),
+                    ('foo', dict(controller='main', action='index'), []),
+                    ('foo', dict(controller='main', action='index'), []),
+                    ('foo', dict(controller='main', action='index'), []),
+                ]),
+            ]),
+
+        ]
+
         c.javascripts = [('spline', 'lib/jquery-1.3.2.min')]
         run_hooks('before_controller', action, **params)
 

@@ -22,6 +22,26 @@
     % endif
     <%include file="/widgets.mako" args="widget='page_header'"/>
 </div>
+
+<%def name="recursive_menu(links)">
+<ul>
+  % for link_tuple in links:
+    % if len(link_tuple) > 2:
+    ## Third one is childrens
+    <li>
+        <a href="${url(**link_tuple[1])}">${link_tuple[0]}</a>
+        ${recursive_menu(link_tuple[2])}
+    </li>
+    % else:
+    <li><a href="${url(**link_tuple[1])}">${link_tuple[0]}</a></li>
+    % endif
+  % endfor
+</ul>
+</%def>
+<div id="menu">
+    ${recursive_menu(c.links)}
+</div>
+
 ## I hate wrapper divs, but these allow for some very nice layout.
 ## #content is used for columns; +padding, -margin, overflow: hidden.
 ## #body-wrapper is used for any-source-order columns.
@@ -31,13 +51,6 @@
     ${next.body()}
   </div>
  </div>
-<!-- Commenting this out until I know how menus are gonna work at all
- <div id="menu">
-    <ul>
-##    <li><a href="${h.url_for(controller='main', action='index')}">Home</a></li>
-    </ul>
- </div>
--->
 </div>
 <div id="footer">
     <p> Powered by Spline </p>
