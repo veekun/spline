@@ -33,6 +33,7 @@ def load_environment(global_conf, app_conf):
     # spline code is running from
     extra_plugins = {}
     config_dir = os.path.dirname(global_conf['__file__'])
+    paths['local'] = config_dir
     if config_dir != root:
         extra_plugins['local'] = LocalPlugin(config_dir)
 
