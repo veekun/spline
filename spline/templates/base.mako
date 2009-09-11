@@ -54,6 +54,7 @@
 </div>
 <div id="footer">
     <p> Powered by Spline </p>
+    <p> Fugue icon set by <a href="http://www.pinvoke.com/">Yusuke Kamiyamane</a> </p>
 </div>
 </body>
 </html>
