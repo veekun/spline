@@ -24,8 +24,7 @@ def make_map(content_dirs=[]):
     """Create, configure and return the routes Mapper"""
     map = Mapper(controller_scan=controller_scan,
                  directory=config['pylons.paths']['controllers'],
-                 always_scan=config['debug'],
-                 explicit=True)
+                 always_scan=config['debug'])
     map.minimization = False
 
     # Content files get explicitly mapped so we don't have to pull any cheap
