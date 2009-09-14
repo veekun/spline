@@ -4,9 +4,9 @@ from openid.extensions.sreg import SRegRequest, SRegResponse
 from openid.store.filestore import FileOpenIDStore
 from sqlalchemy.orm.exc import NoResultFound
 
-from pylons import config, request, response, session, tmpl_context as c
+from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
-from routes import url_for, request_config
+from routes import request_config
 
 from spline import model
 from spline.model import meta
@@ -35,7 +35,7 @@ class AccountsController(BaseController):
 
         host = request.headers['host']
         protocol = request_config().protocol
-        return_url = url_for(host=host, controller='accounts', action='login_finish')
+        return_url = url(host=host, controller='accounts', action='login_finish')
         new_url = auth_request.redirectURL(return_to=return_url,
                                            realm=protocol + '://' + host)
         redirect_to(new_url)
@@ -45,7 +45,7 @@ class AccountsController(BaseController):
 
         cons = Consumer(session=session, store=self.openid_store)
         host = request.headers['host']
-        return_url = url_for(host=host, controller='accounts', action='login_finish')
+        return_url = url(host=host, controller='accounts', action='login_finish')
         res = cons.complete(request.params, return_url)
 
         if res.status != 'success':
