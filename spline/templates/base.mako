@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>${self.title()}</title>
-    <link rel="stylesheet" type="text/css" href="${h.url_for(controller='main', action='css')}">
+    <link rel="stylesheet" type="text/css" href="${url(controller='main', action='css')}">
     % for plugin, script in c.javascripts:
     <script type="text/javascript" src="${h.static_uri(plugin, 'script/%s.js' % script)}"></script>
     % endfor
