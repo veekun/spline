@@ -4,6 +4,14 @@ import os.path
 
 PluginLink = namedtuple('PluginLink', ['label', 'route'])
 
+class Priority(object):
+    """Enum for the order in which to load various components."""
+    VERY_FIRST  = 1
+    FIRST       = 2
+    NORMAL      = 3
+    LAST        = 4
+    VERY_LAST   = 5
+
 class PluginBase(object):
     """Base object for spline plugins.  Plugins should advertise a subclass of
     this class as an entry point.
