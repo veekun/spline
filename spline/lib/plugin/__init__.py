@@ -1,5 +1,8 @@
 """Functionality generally needed to build a plugin."""
+from collections import namedtuple
 import os.path
+
+PluginLink = namedtuple('PluginLink', ['label', 'route'])
 
 class PluginBase(object):
     """Base object for spline plugins.  Plugins should advertise a subclass of
@@ -52,6 +55,22 @@ class PluginBase(object):
         normal, 2/4 are first/last, 1/5 are REALLY first/last.
         `function` is the function you want to be called.  Arguments vary by
         hook.
+        """
+
+        return []
+
+    def links(self):
+        """Returns a list of links belonging to this plugin, represented as
+        tuples like the following:
+            (label, url, child_links)
+
+        Links may be nested arbitrarily deeply.  `url` and `children` are both
+        optional.
+
+        Note that, while you should still use routing to generate URLs for this
+        list, you CANNOT use `pylons.url` to do so, because it's a special
+        object created per thread for various reasons.  Use `routes.url_for`
+        instead.
         """
 
         return []
@@ -109,6 +128,17 @@ class LocalPlugin(PluginBase):
         More reasonable than entire controllers; they could be put in a special
         hooks.py file and loaded/inspected by this class.
         """
+        return []
+
+    def links(self):
+        """Also not yet.
+
+        Needed, someday.  Possibly a special file just like above.  I don't
+        know.  We might need to load an entire real file, scrap all this
+        nonsense, and make the base class do some reasonable introspection
+        regardless of whether this is a plugin or instance.
+        """
+
         return []
 
     def widgets(self):

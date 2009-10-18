@@ -2,6 +2,8 @@
 Plugins themselves should never need to touch anything in this module!
 """
 
+from collections import defaultdict
+
 from pkg_resources import iter_entry_points
 from pylons import config
 
@@ -24,7 +26,9 @@ def load_plugins(paths, extra_plugins={}):
     template_tuples = []  # (directory, priority)
     static_dirs = {}      # plugin_name => directory
     content_dirs = []     # directories
-    hooks = {}            # hook_name => { priority => [functions] }
+    hooks = defaultdict(lambda: defaultdict(list))
+                          # hook_name => { priority => [functions] }
+    link_lambdas = []     # link structure
     widgets = {}          # widget_name => { priority => [template_paths] }
 
     plugins.update(extra_plugins)
@@ -61,12 +65,11 @@ def load_plugins(paths, extra_plugins={}):
 
         # Register some hooks
         for name, priority, function in plugin.hooks():
-            if not name in hooks:
-                hooks[name] = {}
-            if not priority in hooks[name]:
-                hooks[name][priority] = []
-
             hooks[name][priority].append(function)
+
+        # Links want to use url(), but routing isn't set up yet.  Stash the
+        # methods themselves instead and finish the job later
+        link_lambdas.append(plugin.links)
 
         # Register some template hooks^Wwidgets
         for name, priority, path in plugin.widgets():
@@ -85,6 +88,14 @@ def load_plugins(paths, extra_plugins={}):
     # be earlier in the array so they are seen first
     template_tuples.sort(key=lambda x: x[1])
     template_dirs = [x[0] for x in template_tuples]
+
+    # Links still need to actually be run.  If only we had some way to run them
+    # after setup was finished...
+    def construct_link_list(*args, **kwargs):
+        config['spline.plugins.links'] = []
+        for code in link_lambdas:
+            config['spline.plugins.links'].extend(code())
+    hooks['after_setup'][1].append(construct_link_list)
 
     config['spline.plugins'] = plugins
     config['spline.plugins.controllers'] = controllers

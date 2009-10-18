@@ -35,9 +35,12 @@ def make_map(content_dirs=[]):
             for name in files:
                 localpath = os.path.join(root, name)
                 webpath, _ = os.path.splitext(localpath)
+                # Use the full path as a route name so url() can easily route
+                # to a static page
                 map.connect('/' + os.path.relpath(webpath, root),
+                            '/' + os.path.relpath(webpath, root),
                             controller='main', action='content', path=localpath)
-    
+
     # The ErrorController route (handles 404/500 error pages); it should
     # likely stay at the top, ensuring it can always be resolved
     map.connect('/error/{action}', controller='error')

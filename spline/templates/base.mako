@@ -25,16 +25,17 @@
 
 <%def name="recursive_menu(links)">
 <ul>
-  % for link_tuple in links:
-    % if len(link_tuple) > 2:
-    ## Third one is childrens
+  % for label, url, childrens in links:
     <li>
-        <a href="${url(**link_tuple[1])}">${link_tuple[0]}</a>
-        ${recursive_menu(link_tuple[2])}
+        % if url:
+        <a href="${url}">${label}</a>
+        % else:
+        <a>${label}</a>
+        % endif
+        % if childrens:
+        ${recursive_menu(childrens)}
+        % endif
     </li>
-    % else:
-    <li><a href="${url(**link_tuple[1])}">${link_tuple[0]}</a></li>
-    % endif
   % endfor
 </ul>
 </%def>
