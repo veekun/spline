@@ -1,5 +1,6 @@
 """Pylons environment configuration"""
 import os
+import sys
 
 from mako.lookup import TemplateLookup
 from pylons.error import handle_mako_error
@@ -29,19 +30,30 @@ def load_environment(global_conf, app_conf):
     # Initialize config with the basic options
     config.init_app(global_conf, app_conf, package='spline', paths=paths)
 
-    # Create a fake plugin from the config dir if it's not the dir the core
-    # spline code is running from
     extra_plugins = {}
     config_dir = os.path.dirname(global_conf['__file__'])
     paths['local'] = config_dir
     if config_dir != root:
-        extra_plugins['local'] = LocalPlugin(config_dir)
+        # This app isn't running out of a vanilla spline checkout.  See if it
+        # publishes its own local plugin class, and if not, create a generic
+        # one
+        original_path = sys.path
+        sys.path = [config_dir]
+        try:
+            local_module = __import__('plugin')
+            plugin_class = local_module.LocalPlugin
+        except:
+            plugin_class = LocalPlugin
+        finally:
+            # Restore path no matter what!
+            sys.path = original_path
+        extra_plugins['local'] = plugin_class(config_dir)
 
     # Load plugins before routing so we have a list of controllers
     load_plugins(paths, extra_plugins)
     # Add our static directory
     paths['static_files']['spline'] = os.path.join(root, 'public')
-    
+
     config['routes.map'] = make_map(content_dirs=paths['content_files'])
     config['pylons.app_globals'] = app_globals.Globals()
     config['pylons.h'] = spline.lib.helpers
