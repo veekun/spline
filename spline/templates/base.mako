@@ -25,15 +25,15 @@
 
 <%def name="recursive_menu(links)">
 <ul>
-  % for label, url, childrens in links:
+  % for link in links:
     <li>
-        % if url:
-        <a href="${url}">${label}</a>
+        % if link.url:
+        <a href="${link.url}">${link.label}</a>
         % else:
-        <a>${label}</a>
+        <a>${link.label}</a>
         % endif
-        % if childrens:
-        ${recursive_menu(childrens)}
+        % if link.children:
+        ${recursive_menu(link.children)}
         % endif
     </li>
   % endfor

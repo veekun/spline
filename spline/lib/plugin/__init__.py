@@ -12,6 +12,38 @@ class Priority(object):
     LAST        = 4
     VERY_LAST   = 5
 
+class PluginLink(object):
+    """Represents a link in a plugin."""
+
+    def __init__(self, label, url=None, children=[], collapsed=False):
+        """Arguments:
+
+        `label`
+            Label for this link.
+
+        `url`
+            URL for this link.  If omitted, this link may serve as merely a
+            header instead.
+
+        `children`
+            An optional list of PluginLink objects.
+
+        `collapsed`
+            Whether this link appears on the menu.  It will still appear in a
+            table of contents.
+        """
+
+        self.label = label
+        self.url = url
+        self.children = children
+        self.collapsed = collapsed
+
+        # Make this tree bidirectional
+        self.parent = None
+        for child in children:
+            child.parent = self
+
+
 class PluginBase(object):
     """Base object for spline plugins.  Plugins should advertise a subclass of
     this class as an entry point.
@@ -68,17 +100,8 @@ class PluginBase(object):
         return []
 
     def links(self):
-        """Returns a list of links belonging to this plugin, represented as
-        tuples like the following:
-            (label, url, child_links)
-
-        Links may be nested arbitrarily deeply.  `url` and `children` are both
-        optional.
-
-        Note that, while you should still use routing to generate URLs for this
-        list, you CANNOT use `pylons.url` to do so, because it's a special
-        object created per thread for various reasons.  Use `routes.url_for`
-        instead.
+        """Returns a default hierarchy of links, represented as a tree of
+        PluginLink objects.
         """
 
         return []
