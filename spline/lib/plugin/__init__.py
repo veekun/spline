@@ -15,6 +15,11 @@ class Priority(object):
 class PluginLink(object):
     """Represents a link in a plugin."""
 
+    # Pseudo-global dictionary of all seen urls mapped to their respective link
+    # objects.  Used for breadcrumbs, et al.  Hopefully there are no conceptual
+    # problems with this.
+    url_lookup = dict()
+
     def __init__(self, label, url=None, children=[], collapsed=False):
         """Arguments:
 
@@ -42,6 +47,10 @@ class PluginLink(object):
         self.parent = None
         for child in children:
             child.parent = self
+
+        # Remember the link's position in the tree
+        if url:
+            self.url_lookup[url] = self
 
 
 class PluginBase(object):
