@@ -13,8 +13,8 @@ setup(
     author_email='',
     #url='',
     install_requires=[
-        "Pylons>=0.9.6",
-        "SQLAlchemy>=0.4",
+        "Pylons>=0.9.7",
+        "SQLAlchemy>=0.5",
         "Mako",
     ],
     setup_requires=["PasteScript==dev,>=1.6.3dev-r7326"],
