@@ -34,7 +34,13 @@ def make_map(content_dirs=[]):
         for root, dirs, files in os.walk(content_dir):
             for name in files:
                 localpath = os.path.join(root, name)
-                webpath, _ = os.path.splitext(localpath)
+                webpath, ext = os.path.splitext(localpath)
+
+                # Skip over hidden files.
+                # For now, also require a .html extension.
+                if webpath[0] == '.' or ext != '.html':
+                    continue
+
                 # Use the full path as a route name so url() can easily route
                 # to a static page
                 map.connect('/' + os.path.relpath(webpath, root),

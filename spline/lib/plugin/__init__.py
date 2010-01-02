@@ -158,6 +158,10 @@ class LocalPlugin(PluginBase):
         """Assumed to be a directory named `public`."""
         return os.path.join(self.root_dir, 'public')
 
+    def content_dir(self):
+        """Assumed to be a directory named `content`."""
+        return os.path.join(self.root_dir, 'content')
+
     def model(self):
         """No way!"""
         return []
