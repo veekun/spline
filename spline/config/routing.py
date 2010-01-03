@@ -43,8 +43,8 @@ def make_map(content_dirs=[]):
 
                 # Use the full path as a route name so url() can easily route
                 # to a static page
-                map.connect('/' + os.path.relpath(webpath, root),
-                            '/' + os.path.relpath(webpath, root),
+                map.connect('/' + os.path.relpath(webpath, content_dir),
+                            '/' + os.path.relpath(webpath, content_dir),
                             controller='main', action='content', path=localpath)
 
     # The ErrorController route (handles 404/500 error pages); it should
