@@ -59,13 +59,17 @@ def load_environment(global_conf, app_conf):
     config['pylons.h'] = spline.lib.helpers
 
     # Create the Mako TemplateLookup, with the default auto-escaping
+    module_directory = {}
+    if 'cache_dir' in app_conf:
+        module_directory['module_directory'] \
+            = os.path.join(app_conf['cache_dir'], 'templates')
     config['pylons.app_globals'].mako_lookup = TemplateLookup(
         directories=paths['templates'],
         error_handler=handle_mako_error,
-        module_directory=os.path.join(app_conf['cache_dir'], 'templates'),
         input_encoding='utf-8', output_encoding='utf-8',
         imports=['from webhelpers.html import escape'],
-        default_filters=['escape'])
+        default_filters=['escape'],
+        **module_directory)
 
     # Setup SQLAlchemy database engine
     engine = engine_from_config(config, 'sqlalchemy.')
