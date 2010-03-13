@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>${self.title()}</title>
+    <title>${self.title()} - ${config['site_title']}</title>
     <link rel="stylesheet" type="text/css" href="${url(controller='main', action='css')}">
     % for plugin, script in c.javascripts:
     <script type="text/javascript" src="${h.static_uri(plugin, 'script/%s.js' % script)}"></script>
@@ -9,8 +9,8 @@
 </head>
 <body>
 <div id="header">
-    <div id="title">Veekun</div>
-    <div id="page-name">Index</div>
+    <div id="title">${config['site_title']}</div>
+    <div id="page-name">${self.title_in_page()}</div>
     % if 'users' in config['spline.plugins']:
     <div id="user">
     % if c.user:
@@ -61,3 +61,4 @@
 </html>
 
 <%def name="title()">Untitled</%def>
+<%def name="title_in_page()">${self.title()}</%def>
