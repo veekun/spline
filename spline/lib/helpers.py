@@ -7,6 +7,9 @@ from pylons import url
 from webhelpers.html import escape, HTML, literal, url_escape
 from webhelpers.html.tags import *
 
+import re
+
+
 def static_uri(plugin_name, path):
     """Takes the name of a plugin and a path to a static file.
 
@@ -15,6 +18,23 @@ def static_uri(plugin_name, path):
 
     root_url = url('/')
     return "%sstatic/%s/%s" % (root_url, plugin_name, path)
+
+def h1(title, id=None, **attrs):
+    """Returns an <h1> tag that links to itself.
+
+    `title` is the text inside the tag.
+
+    `id` is the HTML id to use; if none is provided, `title` will be munged
+    into something appropriate.
+    """
+    if not id:
+        # See: http://www.w3.org/TR/html4/types.html#type-id
+        id = re.sub('[^-A-Za-z0-9_:.]', '-', title.lower())
+        if not re.match('[a-zA-Z]', id[0]):
+            id = 'x' + id
+
+    link = HTML.a(title, href='#' + id, class_='subtle')
+    return HTML.h1(link, id=id, **attrs)
 
 # Import helpers as desired, or define your own, ie:
 # from webhelpers.html.tags import checkbox, password
