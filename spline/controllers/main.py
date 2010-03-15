@@ -2,8 +2,10 @@ from glob import glob
 import logging
 import os
 
+from mako.template import Template
 from pylons import config, request, response, session, tmpl_context as c
 from pylons.controllers.util import abort, redirect_to
+from pylons.templating import pylons_globals
 
 from spline.lib.base import BaseController, render
 #from spline import model
@@ -46,6 +48,13 @@ class MainController(BaseController):
         """Handles returning "content" files: static content shoved more or
         less verbatim into the wrapper.
         """
-        f = open(path, 'r')
-        c.content = f.read()
-        return render('/content.mako')
+        # Static files need to go through Mako to e.g. set their titles and
+        # generate links, but TemplateLookup will not fetch templates outside
+        # its known template directories.
+        # Instead, load the template manually, and use the same lookup object
+        # as everything else so references to other templates can still work
+        # XXX when there's a real cache mechanism, this should use it!
+        lookup = config['pylons.app_globals'].mako_lookup
+        template = Template(filename=path, lookup=lookup,
+                            **lookup.template_args)
+        return template.render_unicode(**pylons_globals())
