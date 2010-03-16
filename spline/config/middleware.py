@@ -85,14 +85,14 @@ def make_app(global_conf, full_stack=True, **app_conf):
 
     # The Pylons WSGI app
     app = SplineApp()
-    
+
     # CUSTOM MIDDLEWARE HERE (filtered by error handling middlewares)
-    
+
     # Routing/Session/Cache Middleware
     app = RoutesMiddleware(app, config['routes.map'])
     app = SessionMiddleware(app, config)
     app = CacheMiddleware(app, config)
-    
+
     if asbool(full_stack):
         # Handle Python exceptions
         app = ErrorHandler(app, global_conf, **config['pylons.errorware'])
