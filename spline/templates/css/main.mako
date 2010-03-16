@@ -9,6 +9,7 @@ body { background: #ddd; }
 #menu { border-right: 1px solid #2457a0; background: #c6d8f2; }
 #content { background: white; }
 #footer { border-top: 1px solid #2457a0; background: #ddd; }
+#footer #footer-timer { float: right; }
 
 /* Layout: any-order columns */
 #header {}

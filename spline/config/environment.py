@@ -8,12 +8,14 @@ from pylons import config
 from sqlalchemy import engine_from_config
 
 from spline.config.routing import make_map
+from spline.lib.base import SQLATimerProxy
 import spline.lib.app_globals as app_globals
 import spline.lib.helpers
 from spline.lib.plugin import LocalPlugin
 from spline.lib.plugin.load import load_plugins, run_hooks
 import spline.model
 from spline.model import init_model
+
 
 def load_environment(global_conf, app_conf):
     """Configure the Pylons environment via the ``pylons.config``
@@ -72,7 +74,8 @@ def load_environment(global_conf, app_conf):
         **module_directory)
 
     # Setup SQLAlchemy database engine
-    engine = engine_from_config(config, 'sqlalchemy.')
+    # Proxy class is just to record query time
+    engine = engine_from_config(config, 'sqlalchemy.', proxy=SQLATimerProxy())
     init_model(engine)
 
     # CONFIGURATION OPTIONS HERE (note: all config options will override
