@@ -4,7 +4,8 @@ Provides the BaseController class for subclassing.
 """
 from datetime import datetime, timedelta
 
-from pylons import c, config
+from mako.runtime import capture
+from pylons import c, cache, config
 from pylons.controllers import WSGIController
 from pylons.templating import render_mako as render
 from sqlalchemy.interfaces import ConnectionProxy
@@ -37,6 +38,8 @@ class ResponseTimer(object):
     def __init__(self):
         self._start_time = datetime.now()
         self._total_time = None
+
+        self.from_cache = None
 
         # SQLAlchemy will add to these using the above proxy class; see
         # spline.config.environment
@@ -71,3 +74,47 @@ class BaseController(WSGIController):
         finally:
             meta.Session.remove()
             run_hooks('after_controller')
+
+    def cache_content(self, key, do_work, template):
+        """Argh!
+
+        Okay, so.  Use this when you want to cache the BODY of a page but not
+        the CHROME (i.e., wrapper or base or whatever).
+
+        ``key``
+            The key that uniquely identifies this particular rendering of this
+            page content.
+
+        ``do_work``
+            Some function that will stuff a bunch of expensive data in c.  This
+            will only be called if the page hasn't yet been cached.  It'll be
+            passed the key.
+
+        ``template``
+            Name of the template to use.
+
+        Also, DO NOT FORGET TO wrap the cachable part of your template in a
+        <%lib:cache_content> tag, or nothing will get cached!
+
+        If a page body is pulled from cache, c.timer.from_cache will be set to
+        True.  If the page had to be generated, it will be set to False.  (If
+        this function wasn't involved at all, it will be set to None.)
+        """
+
+        content_cache = cache.get_cache('content_cache:' + template)
+
+        def cache_me(context, mako_def):
+            c.timer.from_cache = True
+
+            def generate_page():
+                c.timer.from_cache = False
+                do_work(key)
+                return capture(context, mako_def.body)
+
+            content = content_cache.get_value(key=key, createfunc=generate_page)
+            context.write(content)
+
+        c._cache_me = cache_me
+
+        return render(template)
+
