@@ -20,6 +20,7 @@ class ErrorController(BaseController):
         # let's be safe anyway.
         response = request.environ.get('pylons.original_response')
 
-        c.message = request.GET.get('message', response.status)
-        c.code    = request.GET.get('code',    response.status_int)
+        c.message = request.GET.get('message', response and response.status)
+        c.code    = request.GET.get('code',    response and response.status_int)
+        c.code = int(c.code)
         return render('/error.mako')
