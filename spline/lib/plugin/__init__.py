@@ -215,7 +215,7 @@ class LocalPlugin(PluginBase):
                         ) )
             else:
                 # Single file
-                widget, whatever = os.path.splitext(widget_file)
+                widget, whatever = os.path.splitext(candidate_file)
                 widgets.append( (widget, 3, '/widgets/%s' % candidate_file) )
 
         return widgets

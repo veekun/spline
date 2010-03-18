@@ -4,6 +4,7 @@
     <title>${self.title()} - ${config['site_title']}</title>
     <link rel="shortcut icon" type="image/png" href="${h.static_uri('local', 'favicon.png')}">
     <link rel="stylesheet" type="text/css" href="${url(controller='main', action='css')}">
+    <%include file="/widgets.mako" args="widget='head_tag'"/>
     % for plugin, script in c.javascripts:
     <script type="text/javascript" src="${h.static_uri(plugin, 'script/%s.js' % script)}"></script>
     % endfor
