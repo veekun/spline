@@ -44,6 +44,18 @@
     ${recursive_menu(c.links)}
 </div>
 
+<% flash = h._flash.pop_messages() %>
+% if flash:
+<ul id="flash">
+    % for message, extras in flash:
+    <li>
+        <img src="${h.static_uri('spline', "icons/{0}.png".format(extras.get('icon', 'hand-point')))}" alt="">
+        ${message}
+    </li>
+    % endfor
+</ul>
+% endif
+
 ## I hate wrapper divs, but these allow for some very nice layout.
 ## #content is used for columns; +padding, -margin, overflow: hidden.
 ## #body-wrapper is used for any-source-order columns.
