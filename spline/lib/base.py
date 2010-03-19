@@ -101,7 +101,9 @@ class BaseController(WSGIController):
         this function wasn't involved at all, it will be set to None.)
         """
 
-        content_cache = cache.get_cache('content_cache:' + template)
+        # Cache in a file for...  ten hours?  Sure, whatever
+        content_cache = cache.get_cache('content_cache:' + template,
+                                        type='file', expiretime=36000)
 
         def cache_me(context, mako_def):
             c.timer.from_cache = True
