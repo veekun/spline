@@ -23,10 +23,13 @@ class SQLATimerProxy(ConnectionProxy):
         try:
             return execute(cursor, statement, parameters, context)
         finally:
-            if c and hasattr(c, 'timer'):
+            try:
                 delta = datetime.now() - now
                 c.timer.sql_time += delta
                 c.timer.sql_queries += 1
+            except (TypeError, AttributeError):
+                # Might happen if SQL is run before Pylons is done starting
+                pass
 
 class ResponseTimer(object):
     """Nearly trivial class, used for tracking how long the page took to
