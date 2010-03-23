@@ -23,13 +23,13 @@ def flash(message, icon=None):
 
     _flash((message, extras))
 
-def static_uri(plugin_name, path):
+def static_uri(plugin_name, path, **url_kwargs):
     """Takes the name of a plugin and a path to a static file.
 
     Returns a full URI to the given file, as owned by the named plugin.
     """
 
-    root_url = url('/')
+    root_url = url('/', **url_kwargs)
     return "%sstatic/%s/%s" % (root_url, plugin_name, path)
 
 def h1(title, id=None, **attrs):
