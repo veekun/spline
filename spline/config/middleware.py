@@ -93,6 +93,10 @@ def make_app(global_conf, full_stack=True, **app_conf):
     app = SessionMiddleware(app, config)
     app = CacheMiddleware(app, config)
 
+    # Super ultra debug mode
+    #from paste.translogger import TransLogger
+    #app = TransLogger(app)
+
     if asbool(full_stack):
         # Handle Python exceptions
         app = ErrorHandler(app, global_conf, **config['pylons.errorware'])
