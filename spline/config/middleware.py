@@ -88,10 +88,16 @@ def make_app(global_conf, full_stack=True, **app_conf):
 
     # CUSTOM MIDDLEWARE HERE (filtered by error handling middlewares)
 
+    # XXX This is dumb.  Hack around a Beaker bug which ignores enabled=False
+    # in config -- but not, thankfully, in kwargs
+    cache_kwargs = {}
+    if 'beaker.cache.enabled' in config:
+        cache_kwargs['enabled'] = asbool(config['beaker.cache.enabled'])
+
     # Routing/Session/Cache Middleware
     app = RoutesMiddleware(app, config['routes.map'])
     app = SessionMiddleware(app, config)
-    app = CacheMiddleware(app, config)
+    app = CacheMiddleware(app, config, **cache_kwargs)
 
     # Super ultra debug mode
     #from paste.translogger import TransLogger

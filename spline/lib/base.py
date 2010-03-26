@@ -108,6 +108,15 @@ class BaseController(WSGIController):
         content_cache = cache.get_cache('content_cache:' + template,
                                         type='file', expiretime=36000)
 
+        # XXX This is dumb.  Caches don't actually respect the 'enabled'
+        # setting, so we gotta fake it.
+        if not content_cache.nsargs.get('enabled', True):
+            def skip_cache(context, mako_def):
+                do_work(key)
+                mako_def.body()
+            c._cache_me = skip_cache
+            return render(template)
+
         def cache_me(context, mako_def):
             c.timer.from_cache = True
 
