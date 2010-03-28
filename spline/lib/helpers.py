@@ -32,7 +32,7 @@ def static_uri(plugin_name, path, **url_kwargs):
     root_url = url('/', **url_kwargs)
     return "%sstatic/%s/%s" % (root_url, plugin_name, path)
 
-def h1(title, id=None, **attrs):
+def h1(title, id=None, tag='h1', **attrs):
     """Returns an <h1> tag that links to itself.
 
     `title` is the text inside the tag.
@@ -47,7 +47,11 @@ def h1(title, id=None, **attrs):
             id = 'x' + id
 
     link = HTML.a(title, href='#' + id, class_='subtle')
-    return HTML.h1(link, id=id, **attrs)
+    return HTML.tag(tag, link, id=id, **attrs)
+
+def h2(title, id=None, **attrs):
+    """Similar to `h1`, but for an <h2>!"""
+    return h1(title, id=id, tag='h2', **attrs)
 
 # Import helpers as desired, or define your own, ie:
 # from webhelpers.html.tags import checkbox, password
