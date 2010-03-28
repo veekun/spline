@@ -10,3 +10,5 @@
     <dd class="error">${error}</dd>
     % endfor
 </%def>
+
+<%def name="escape_html()" filter="h">${caller.body()}</%def>
