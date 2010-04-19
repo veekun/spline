@@ -11,4 +11,11 @@
     % endfor
 </%def>
 
+<%def name="bare_field(name, **render_args)">
+    ${c.form[name](**render_args) | n}
+    % for error in c.form[name].errors:
+    <p class="error">${error}</p>
+    % endfor
+</%def>
+
 <%def name="escape_html()" filter="h">${caller.body()}</%def>
