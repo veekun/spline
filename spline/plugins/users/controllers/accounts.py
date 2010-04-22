@@ -10,6 +10,7 @@ from routes import request_config
 
 from spline import model
 from spline.model import meta
+from spline.lib import helpers as h
 from spline.lib.base import BaseController, render
 
 log = logging.getLogger(__name__)
@@ -76,4 +77,19 @@ class AccountsController(BaseController):
         session['user_id'] = user.id
         session.save()
 
-        redirect_to(url('/'))
+        h.flash(u"""Hello, {0}!""".format(user.name),
+                icon='user')
+
+        redirect_to('/', _code=303)
+
+    def logout(self):
+        """Logs the user out."""
+
+        if 'user_id' in session:
+            del session['user_id']
+            session.save()
+
+            h.flash(u"""Logged out.""",
+                    icon='user-silhouette')
+
+        redirect_to('/', _code=303)
