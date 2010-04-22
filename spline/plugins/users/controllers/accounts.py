@@ -61,7 +61,8 @@ class AccountsController(BaseController):
             sreg_res = SRegResponse.fromSuccessResponse(res)
             try:
                 username = sreg_res['nickname']
-            except KeyError:
+            except (KeyError, TypeError):
+                # KeyError if sreg has no nickname; TypeError if sreg is None
                 username = 'Anonymous'
 
             # Create db records
@@ -75,4 +76,4 @@ class AccountsController(BaseController):
         session['user_id'] = user.id
         session.save()
 
-        return "Hello, %s" % user.name
+        redirect_to(url('/'))
