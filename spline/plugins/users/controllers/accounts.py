@@ -69,8 +69,10 @@ class AccountsController(BaseController):
             # Create db records
             user = model.User(name=username)
             meta.Session.add(user)
+
             openid = model.OpenID(openid=res.identity_url)
             user.openids.append(openid)
+
             meta.Session.commit()
 
         # Remember who's logged in, and we're good to go
