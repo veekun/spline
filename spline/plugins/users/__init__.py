@@ -8,6 +8,7 @@ import spline.model as model
 import spline.model.meta as meta
 
 import spline.plugins.users.controllers.accounts
+import spline.plugins.users.controllers.users
 import spline.plugins.users.model
 
 def add_routes_hook(map, *args, **kwargs):
@@ -15,6 +16,9 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/accounts/login_begin', controller='accounts', action='login_begin')
     map.connect('/accounts/login_finish', controller='accounts', action='login_finish')
     map.connect('/accounts/logout', controller='accounts', action='logout')
+
+    map.connect('/users/{id};{name}', controller='users', action='view')
+    map.connect('/users/{id}', controller='users', action='view')
 
 def check_userid_hook(action, **params):
     """Hook to see if a user is logged in and, if so, stick a user object in
@@ -40,6 +44,7 @@ class UsersPlugin(PluginBase):
     def controllers(self):
         return dict(
             accounts = spline.plugins.users.controllers.accounts.AccountsController,
+            users = spline.plugins.users.controllers.users.UsersController,
         )
 
     def model(self):
