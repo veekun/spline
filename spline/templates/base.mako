@@ -13,15 +13,6 @@
 <div id="header">
     <div id="title">${config['site_title']}</div>
     <div id="page-name">${self.title_in_page()}</div>
-    % if 'users' in config['spline.plugins']:
-    <div id="user">
-    % if c.user:
-    <p> Welcome, ${c.user.name}! </p>
-    % else:
-    <p> <!-- login form --> </p>
-    % endif
-    </div>
-    % endif
     <%include file="/widgets.mako" args="widget='page_header'"/>
 </div>
 
