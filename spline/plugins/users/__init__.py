@@ -13,12 +13,17 @@ import spline.plugins.users.model
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
+    # Login, logout
     map.connect('/accounts/login_begin', controller='accounts', action='login_begin')
     map.connect('/accounts/login_finish', controller='accounts', action='login_finish')
     map.connect('/accounts/logout', controller='accounts', action='logout')
 
-    map.connect('/users/{id};{name}', controller='users', action='view')
-    map.connect('/users/{id}', controller='users', action='view')
+    # Self-admin
+    map.connect('/users/{id};{name}/edit', controller='users', action='profile_edit')
+
+    # Public per-user pages
+    map.connect('/users/{id};{name}', controller='users', action='profile')
+    map.connect('/users/{id}', controller='users', action='profile')
 
 def check_userid_hook(action, **params):
     """Hook to see if a user is logged in and, if so, stick a user object in
