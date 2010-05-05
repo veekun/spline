@@ -20,7 +20,9 @@
 <ul>
   % for link in links:
     <li>
-        % if link.url:
+        % if not link.label:
+        <!-- nothin -->
+        % elif link.url:
         <a href="${link.url}">${link.label}</a>
         % else:
         <a>${link.label}</a>
