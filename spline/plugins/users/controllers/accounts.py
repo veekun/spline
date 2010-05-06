@@ -2,6 +2,7 @@ import logging
 from openid.consumer.consumer import Consumer
 from openid.extensions.sreg import SRegRequest, SRegResponse
 from openid.store.filestore import FileOpenIDStore
+from openid.yadis.discover import DiscoveryFailure
 from sqlalchemy.orm.exc import NoResultFound
 
 from pylons import config, request, response, session, tmpl_context as c, url
@@ -19,17 +20,36 @@ class AccountsController(BaseController):
 
     openid_store = FileOpenIDStore('/var/tmp')
 
-    def index(self):
-        # Return a rendered template
-        #   return render('/template.mako')
-        # or, Return a response
-        return str(request.headers) + request.environ.get('scheme', '')
+    def _bail(self, reason):
+        # Used for bailing on a login attempt; reshows the login page
+        c.error = reason
+        c.attempted_openid = request.params.get('openid', '')
+        return render('/users/login.mako')
+
+
+    def login(self):
+        c.error = None
+        c.attempted_openid = None
+        return render('/users/login.mako')
 
     def login_begin(self):
         """Step one of logging in with OpenID; we redirect to the provider"""
 
         cons = Consumer(session=session, store=self.openid_store)
-        auth_request = cons.begin(request.params['openid'])
+
+        try:
+            openid_url = request.params['openid']
+        except KeyError:
+            return self._bail("Gotta enter an OpenID to log in.")
+
+        try:
+            auth_request = cons.begin(openid_url)
+        except DiscoveryFailure:
+            return self._bail(
+                "Can't connect to '{0}'.  You sure it's an OpenID?"
+                .format(openid_url)
+            )
+
         sreg_req = SRegRequest(optional=['nickname', 'email', 'dob', 'gender',
                                          'country', 'language', 'timezone'])
         auth_request.addExtension(sreg_req)

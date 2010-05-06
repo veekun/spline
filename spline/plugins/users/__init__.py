@@ -14,6 +14,7 @@ import spline.plugins.users.model
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
     # Login, logout
+    map.connect('/accounts/login', controller='accounts', action='login')
     map.connect('/accounts/login_begin', controller='accounts', action='login_begin')
     map.connect('/accounts/login_finish', controller='accounts', action='login_finish')
     map.connect('/accounts/logout', controller='accounts', action='logout')
