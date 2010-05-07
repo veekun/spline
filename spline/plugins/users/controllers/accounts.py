@@ -23,7 +23,7 @@ class AccountsController(BaseController):
     def _bail(self, reason):
         # Used for bailing on a login attempt; reshows the login page
         c.error = reason
-        c.attempted_openid = request.params.get('openid', '')
+        c.attempted_openid = request.params.get('openid_identifier', '')
         return render('/users/login.mako')
 
 
@@ -38,7 +38,7 @@ class AccountsController(BaseController):
         cons = Consumer(session=session, store=self.openid_store)
 
         try:
-            openid_url = request.params['openid']
+            openid_url = request.params['openid_identifier']
         except KeyError:
             return self._bail("Gotta enter an OpenID to log in.")
 

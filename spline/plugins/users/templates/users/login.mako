@@ -9,7 +9,7 @@
 
 ${h.form(url(controller='accounts', action='login_begin'), id='user')}
     <img src="${h.static_uri('spline', 'icons/openid.png')}">
-    <input type="text" name="openid" size="30" value="${c.attempted_openid or ''}">
+    <input type="text" name="openid_identifier" size="30" value="${c.attempted_openid or ''}">
     <input type="submit" value="Log in">
 ${h.end_form()}
 
