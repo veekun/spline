@@ -86,5 +86,5 @@ class UsersController(BaseController):
         h.flash('Saved your profile.', icon='tick')
 
         redirect_to(controller='users', action='profile',
-                    id=c.page_user.id, name=c.page_user.name.lower(),
+                    id=c.page_user.id, name=c.page_user.name,
                     _code=303)
