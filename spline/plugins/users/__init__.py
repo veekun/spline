@@ -22,7 +22,8 @@ def add_routes_hook(map, *args, **kwargs):
     # Self-admin
     map.connect('/users/{id};{name}/edit', controller='users', action='profile_edit')
 
-    # Public per-user pages
+    # Public user pages
+    map.connect('/users', controller='users', action='list')
     map.connect('/users/{id};{name}', controller='users', action='profile')
     map.connect('/users/{id}', controller='users', action='profile')
 

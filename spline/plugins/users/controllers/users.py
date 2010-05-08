@@ -41,11 +41,9 @@ class ProfileEditForm(Form):
 
 class UsersController(BaseController):
 
-    def index(self):
-        # Return a rendered template
-        #   return render('/template.mako')
-        # or, Return a response
-        return 'stub'
+    def list(self):
+        c.users = meta.Session.query(model.User).order_by(model.User.id.asc())
+        return render('/users/list.mako')
 
     def profile(self, id, name=None):
         """Main user profile.
