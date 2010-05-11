@@ -12,7 +12,9 @@ import spline.plugins.forum.model
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
-    map.connect('/forum', controller='forum', action='index')
+    map.connect('/forums', controller='forum', action='forums')
+    map.connect('/forums/{forum_id}', controller='forum', action='threads')
+    map.connect('/forums/{forum_id}/threads/{thread_id}', controller='forum', action='posts')
 
 
 class ForumPlugin(PluginBase):
@@ -20,6 +22,13 @@ class ForumPlugin(PluginBase):
         return dict(
             forum = spline.plugins.forum.controllers.forum.ForumController,
         )
+
+    def model(self):
+        return [
+            model.Forum,
+            model.Thread,
+            model.Post,
+        ]
 
     def template_dirs(self):
         return [

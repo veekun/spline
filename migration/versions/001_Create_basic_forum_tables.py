@@ -1,8 +1,9 @@
-from sqlalchemy import Column, ForeignKey
-from sqlalchemy.orm import relation
-from sqlalchemy.types import DateTime, Integer, Unicode
+from sqlalchemy import *
+from migrate import *
 
-from spline.model.meta import TableBase
+from sqlalchemy.ext.declarative import declarative_base
+TableBase = declarative_base(bind=migrate_engine)
+
 
 class Forum(TableBase):
     __tablename__ = 'forums'
@@ -23,7 +24,12 @@ class Post(TableBase):
     content = Column(Unicode(5120), nullable=False)
 
 
-# XXX sort by time, how?
-Forum.threads = relation(Thread, order_by=Thread.id.desc(), backref='forum')
+def upgrade():
+    Forum.__table__.create()
+    Thread.__table__.create()
+    Post.__table__.create()
 
-Thread.posts = relation(Post, order_by=Post.posted_time.desc(), backref='thread')
+def downgrade():
+    Post.__table__.drop()
+    Thread.__table__.drop()
+    Forum.__table__.drop()

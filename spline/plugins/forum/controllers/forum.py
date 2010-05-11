@@ -14,8 +14,23 @@ log = logging.getLogger(__name__)
 
 class ForumController(BaseController):
 
-    def index(self):
-        # Return a rendered template
-        #   return render('/template.mako')
-        # or, Return a response
-        return 'stub'
+    def forums(self):
+        c.forums = meta.Session.query(model.Forum).order_by(model.Forum.id.asc())
+        return render('/forum/forums.mako')
+
+    def threads(self, forum_id):
+        try:
+            c.forum = meta.Session.query(model.Forum).get(forum_id)
+        except NoResultFound:
+            abort(404)
+
+        return render('/forum/threads.mako')
+
+    def posts(self, forum_id, thread_id):
+        try:
+            c.thread = meta.Session.query(model.Thread) \
+                .filter_by(id=thread_id, forum_id=forum_id).one()
+        except NoResultFound:
+            abort(404)
+
+        return render('/forum/threads.mako')
