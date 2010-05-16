@@ -13,7 +13,7 @@ setup(
 
     zip_safe = False,
 
-    entry_points = {'spline.plugins': 'forum = spline.plugins.forum:ForumPlugin'},
+    entry_points = {'spline.plugins': 'forum = splinext.forum:ForumPlugin'},
 
-    namespace_packages = ['spline', 'spline.plugins'],
+    namespace_packages = ['splinext'],
 )

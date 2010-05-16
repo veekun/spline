@@ -7,8 +7,8 @@ from spline.lib.plugin import PluginBase, PluginLink, Priority
 import spline.model as model
 import spline.model.meta as meta
 
-import spline.plugins.forum.controllers.forum
-import spline.plugins.forum.model
+import splinext.forum.controllers.forum
+import splinext.forum.model
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
@@ -20,7 +20,7 @@ def add_routes_hook(map, *args, **kwargs):
 class ForumPlugin(PluginBase):
     def controllers(self):
         return dict(
-            forum = spline.plugins.forum.controllers.forum.ForumController,
+            forum = splinext.forum.controllers.forum.ForumController,
         )
 
     def model(self):
