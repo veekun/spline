@@ -7,9 +7,9 @@ from spline.lib.plugin import PluginBase, PluginLink, Priority
 import spline.model as model
 import spline.model.meta as meta
 
-import spline.plugins.users.controllers.accounts
-import spline.plugins.users.controllers.users
-import spline.plugins.users.model
+import splinext.users.controllers.accounts
+import splinext.users.controllers.users
+import splinext.users.model
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
@@ -50,14 +50,14 @@ def check_userid_hook(action, **params):
 class UsersPlugin(PluginBase):
     def controllers(self):
         return dict(
-            accounts = spline.plugins.users.controllers.accounts.AccountsController,
-            users = spline.plugins.users.controllers.users.UsersController,
+            accounts = splinext.users.controllers.accounts.AccountsController,
+            users = splinext.users.controllers.users.UsersController,
         )
 
     def model(self):
         return [
-            spline.plugins.users.model.User,
-            spline.plugins.users.model.OpenID,
+            splinext.users.model.User,
+            splinext.users.model.OpenID,
         ]
 
     def template_dirs(self):
