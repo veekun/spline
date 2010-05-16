@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>${self.title()} - ${config['site_title']}</title>
+    <title>${self.title()} - ${config['spline.site_title']}</title>
     <link rel="shortcut icon" type="image/png" href="${h.static_uri('local', 'favicon.png')}">
     <link rel="stylesheet" type="text/css" href="${url(controller='main', action='css')}">
     <%include file="/widgets.mako" args="widget='head_tag'"/>
@@ -11,7 +11,7 @@
 </head>
 <body>
 <div id="header">
-    <div id="title">${config['site_title']}</div>
+    <div id="title">${config['spline.site_title']}</div>
     <div id="page-name">${self.title_in_page()}</div>
     <%include file="/widgets.mako" args="widget='page_header'"/>
 </div>

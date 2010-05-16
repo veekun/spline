@@ -2,6 +2,9 @@
 from collections import namedtuple
 import os.path
 
+import pkg_resources
+
+
 PluginLink = namedtuple('PluginLink', ['label', 'route'])
 
 class Priority(object):
@@ -58,8 +61,26 @@ class PluginBase(object):
     this class as an entry point.
     """
 
-    def __init__(self):
-        pass
+    config_template_filename = 'deployment.ini_tmpl'
+
+    def __init__(self, entry_point):
+        self.entry_point = entry_point
+
+    def config_template_path(self):
+        """Returns a path to a Mako template for a new configuration file.
+        This file will be included in configuration files created by `paster
+        make-config`.
+
+        By default, looks for a `deployment.ini_tmpl` file in the base module
+        directory.
+        """
+        if pkg_resources.resource_exists(
+            self.entry_point.module_name, 'deployment.ini_tmpl'):
+
+            return pkg_resources.resource_filename(
+                self.entry_point.module_name, 'deployment.ini_tmpl')
+
+        return None
 
     def controllers(self):
         """Returns a dictionary mapping routing names to controllers."""

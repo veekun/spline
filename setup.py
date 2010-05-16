@@ -38,6 +38,6 @@ setup(
     main = spline.config.middleware:make_app
 
     [paste.app_install]
-    main = pylons.util:PylonsInstaller
+    main = spline.installer:Installer
     """,
 )

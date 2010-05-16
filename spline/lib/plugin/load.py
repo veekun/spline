@@ -26,7 +26,7 @@ def load_plugins(paths, extra_plugins={}):
     # default is dumb
     config_plugins = None
     if 'plugins' in config['app_conf']:
-        config_plugins = config['app_conf']['plugins'].split()
+        config_plugins = config['app_conf']['spline.plugins'].split()
 
     plugins = {}          # plugin_name => plugin
     controllers = {}      # controller_name => controller
@@ -52,7 +52,7 @@ def load_plugins(paths, extra_plugins={}):
             raise ValueError("'local' and all names starting with 'spline' are"
                              " reserved.")
 
-        plugin = plugin_class()
+        plugin = plugin_class(ep)
         plugins[ep.name] = plugin
 
     for plugin_name, plugin in plugins.items():

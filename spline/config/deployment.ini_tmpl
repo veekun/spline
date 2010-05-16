@@ -1,8 +1,5 @@
-#
 # spline - Pylons configuration
-#
 # The %(here)s variable will be replaced with the parent directory of this file
-#
 [DEFAULT]
 debug = true
 email_to = you@yourdomain.com
@@ -36,6 +33,20 @@ sqlalchemy.echo = False
 # Debug mode will enable the interactive debugging tool, allowing ANYONE to
 # execute malicious code after an exception is raised.
 set debug = false
+
+
+#---- Spline plugin configuration
+
+# List of plugins to use, separated by spaces.  If you leave this commented
+# out, all plugins found on the system will be loaded.
+#spline.plugins = users forum pokedex
+
+# Title of the site
+spline.site_title = spline
+
+% for path in spline_plugin_config_files:
+<%include file="${path}"/>
+% endfor
 
 
 # Logging configuration
