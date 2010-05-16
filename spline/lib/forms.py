@@ -2,7 +2,7 @@
 """Useful extra form fields."""
 
 from sqlalchemy.orm.exc import NoResultFound
-from wtforms import fields, widgets
+from wtforms import fields, widgets, ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 
 
