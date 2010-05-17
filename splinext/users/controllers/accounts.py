@@ -9,10 +9,10 @@ from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
 from routes import request_config
 
-from spline import model
 from spline.model import meta
 from spline.lib import helpers as h
 from spline.lib.base import BaseController, render
+from splinext.users import model as users_model
 
 log = logging.getLogger(__name__)
 
@@ -74,8 +74,8 @@ class AccountsController(BaseController):
 
         try:
             # Grab an existing user record, if one exists
-            q = meta.Session.query(model.User) \
-                    .filter(model.User.openids.any(openid=res.identity_url))
+            q = meta.Session.query(users_model.User) \
+                    .filter(users_model.User.openids.any(openid=res.identity_url))
             user = q.one()
         except NoResultFound:
             # Try to pull a name out of the SReg response
@@ -87,10 +87,10 @@ class AccountsController(BaseController):
                 username = 'Anonymous'
 
             # Create db records
-            user = model.User(name=username)
+            user = users_model.User(name=username)
             meta.Session.add(user)
 
-            openid = model.OpenID(openid=res.identity_url)
+            openid = users_model.OpenID(openid=res.identity_url)
             user.openids.append(openid)
 
             meta.Session.commit()

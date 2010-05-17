@@ -8,10 +8,10 @@ from pylons.controllers.util import abort, redirect_to
 from routes import request_config
 from sqlalchemy.orm.exc import NoResultFound
 
-from spline import model
 from spline.model import meta
 from spline.lib import helpers as h
 from spline.lib.base import BaseController, render
+from splinext.users import model as users_model
 
 log = logging.getLogger(__name__)
 
@@ -42,7 +42,8 @@ class ProfileEditForm(Form):
 class UsersController(BaseController):
 
     def list(self):
-        c.users = meta.Session.query(model.User).order_by(model.User.id.asc())
+        c.users = meta.Session.query(users_model.User) \
+            .order_by(users_model.User.id.asc())
         return render('/users/list.mako')
 
     def profile(self, id, name=None):
@@ -52,7 +53,7 @@ class UsersController(BaseController):
         entirely optional and ignored.
         """
 
-        c.page_user = meta.Session.query(model.User).get(id)
+        c.page_user = meta.Session.query(users_model.User).get(id)
         if not c.page_user:
             abort(404)
 
@@ -60,7 +61,7 @@ class UsersController(BaseController):
 
     def profile_edit(self, id, name=None):
         """Main user profile editing."""
-        c.page_user = meta.Session.query(model.User).get(id)
+        c.page_user = meta.Session.query(users_model.User).get(id)
         if not c.page_user:
             abort(404)
 

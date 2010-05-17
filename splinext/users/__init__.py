@@ -4,12 +4,11 @@ from pylons import c, session
 
 from spline.lib.plugin import PluginBase
 from spline.lib.plugin import PluginBase, PluginLink, Priority
-import spline.model as model
 import spline.model.meta as meta
 
 import splinext.users.controllers.accounts
 import splinext.users.controllers.users
-import splinext.users.model
+from splinext.users import model as users_model
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
@@ -37,7 +36,7 @@ def check_userid_hook(action, **params):
     if not 'user_id' in session:
         return
 
-    user = meta.Session.query(model.User).get(session['user_id'])
+    user = meta.Session.query(users_model.User).get(session['user_id'])
     if not user:
         # Bogus id in the session somehow.  Clear it
         del session['user_id']
@@ -53,12 +52,6 @@ class UsersPlugin(PluginBase):
             accounts = splinext.users.controllers.accounts.AccountsController,
             users = splinext.users.controllers.users.UsersController,
         )
-
-    def model(self):
-        return [
-            splinext.users.model.User,
-            splinext.users.model.OpenID,
-        ]
 
     def template_dirs(self):
         return [
