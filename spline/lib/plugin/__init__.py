@@ -2,7 +2,7 @@
 from collections import namedtuple
 import os.path
 
-import pkg_resources
+from pkg_resources import resource_exists, resource_filename, resource_isdir
 
 
 PluginLink = namedtuple('PluginLink', ['label', 'route'])
@@ -63,8 +63,22 @@ class PluginBase(object):
 
     config_template_filename = 'deployment.ini_tmpl'
 
+    def _resource_or_bust(self, path, isdir=False):
+        """Returns the path to a resource, or None if it doesn't exist."""
+        if resource_exists(self.module_name, path) and \
+           resource_isdir(self.module_name, path) == isdir:
+            return resource_filename(self.module_name, path)
+
+        return None
+
+
     def __init__(self, entry_point):
         self.entry_point = entry_point
+
+    @property
+    def module_name(self):
+        """This plugin's module name, e.g. 'splinext.pokedex'."""
+        return self.entry_point.module_name
 
     def config_template_path(self):
         """Returns a path to a Mako template for a new configuration file.
@@ -74,13 +88,7 @@ class PluginBase(object):
         By default, looks for a `deployment.ini_tmpl` file in the base module
         directory.
         """
-        if pkg_resources.resource_exists(
-            self.entry_point.module_name, 'deployment.ini_tmpl'):
-
-            return pkg_resources.resource_filename(
-                self.entry_point.module_name, 'deployment.ini_tmpl')
-
-        return None
+        return self._resource_or_bust(self.config_template_filename)
 
     def controllers(self):
         """Returns a dictionary mapping routing names to controllers."""
@@ -90,25 +98,31 @@ class PluginBase(object):
         """Returns a list of directories containing templates.
 
         Each element of this list should be a tuple of (directory, priority).
+
+        By default, looks for a `templates` directory in the base module
+        directory, and assumes normal priority.
         """
-        return []
+        template_dir = self._resource_or_bust('templates', isdir=True)
+        if template_dir:
+            return [ (template_dir, Priority.NORMAL) ]
+        else:
+            return []
 
     def static_dir(self):
-        """Returns a directory containing static files, or None for none."""
-        return None
+        """Returns a directory containing static files, or None for none.
+
+        By default, looks for a `public` directory in the base module
+        directory.
+        """
+        return self._resource_or_bust('public', isdir=True)
 
     def content_dir(self):
-        """Returns a directory containing content files, or None for none."""
-        return None
+        """Returns a directory containing content files, or None for none.
 
-    def model(self):
-        """Returns a list of classes to stick in Spline's model namespace.
-
-        Please be sure to list ALL model classes here; otherwise, the rest of
-        the app will have trouble finding them, which can be important for
-        things like creating all new tables as InnoDB.
+        By default, looks for a `content` directory in the base module
+        directory.
         """
-        return []
+        return self._resource_or_bust('content', isdir=True)
 
     def hooks(self):
         """Returns a list of tuples in the form `(hook_name, priority, function)`.
@@ -119,12 +133,15 @@ class PluginBase(object):
         `users` plugin uses this to check the session for a logged-in user on
         each request.
 
-        `hook_name` is a string identifying a hook somewhere in either Spline
-        core or another plugin.
-        `priority` is a number from 1 to 5 using Apache conventions: 3 is
-        normal, 2/4 are first/last, 1/5 are REALLY first/last.
-        `function` is the function you want to be called.  Arguments vary by
-        hook.
+        `hook_name`
+            A string identifying a hook somewhere in either Spline core or
+            another plugin.
+
+        `priority`
+            A `Priority`, identifying when this hook should be run.
+
+        `function`
+            The function you want to be called.  Arguments vary by hook.
         """
 
         return []
@@ -142,25 +159,28 @@ class PluginBase(object):
         A widget is similar to a hook, except it's a Mako template rather than
         a Python function.
 
-        `widget_name` is a string identifying a template hook somewhere in
-        either Spline core or another plugin.
-        `priority` is a number from 1 to 5 using Apache conventions: 3 is
-        normal, 2/4 are first/last, 1/5 are REALLY first/last.
-        `template_path` is the path to a template containing this widget.
-        Arguments vary by hook.
+        `widget_name`
+            A string identifying a template hook somewhere in either Spline
+            core or another plugin.
+
+        `priority`
+            A `Priority`, identifying when this hook should be run.
+
+        `template_path`
+            The path to a template containing this widget.  Arguments vary by
+            hook.
         """
 
         return []
 
 
-class LocalPlugin(PluginBase):
+class LocalPlugin(object):
     """A pseudo-plugin created from an instance directory.  It examines the
     directory for appropriately-named subdirectories containing static data and
     returns them from the appropriate methods.
     """
 
     def __init__(self, root_dir):
-        """This can't call super() as it changes the signature.  Whatever."""
         self.root_dir = root_dir
 
     def controllers(self):
@@ -188,21 +208,12 @@ class LocalPlugin(PluginBase):
         return []
 
     def hooks(self):
-        """Not yet.
+        """Can be overridden in plugin.py."""
 
-        More reasonable than entire controllers; they could be put in a special
-        hooks.py file and loaded/inspected by this class.
-        """
         return []
 
     def links(self):
-        """Also not yet.
-
-        Needed, someday.  Possibly a special file just like above.  I don't
-        know.  We might need to load an entire real file, scrap all this
-        nonsense, and make the base class do some reasonable introspection
-        regardless of whether this is a plugin or instance.
-        """
+        """Can be overridden in plugin.py."""
 
         return []
 

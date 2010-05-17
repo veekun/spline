@@ -71,10 +71,6 @@ def load_plugins(paths, extra_plugins={}):
         if content_dir is not None:
             content_dirs.append(content_dir)
 
-        # Get list of model classes and inject them into model module
-        for cls in plugin.model():
-            setattr(spline.model, cls.__name__, cls)
-
         # Register some hooks
         for name, priority, function in plugin.hooks():
             hooks[name][priority].append(function)
