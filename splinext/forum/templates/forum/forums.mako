@@ -2,8 +2,10 @@
 
 <%def name="title()">Forums</%def>
 
-<ul class="classic-list">
+<table>
     % for forum in c.forums:
-    <li><a href="${url(controller='forum', action='threads', forum_id=forum.id)}">${forum.name}</a></li>
+    <tr>
+        <td><a href="${url(controller='forum', action='threads', forum_id=forum.id)}">${forum.name}</a></td>
+    </tr>
     % endfor
-</ul>
+</table>

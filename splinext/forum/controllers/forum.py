@@ -25,6 +25,8 @@ class ForumController(BaseController):
         except NoResultFound:
             abort(404)
 
+        c.threads = c.forum.threads
+
         return render('/forum/threads.mako')
 
     def posts(self, forum_id, thread_id):
@@ -34,4 +36,4 @@ class ForumController(BaseController):
         except NoResultFound:
             abort(404)
 
-        return render('/forum/threads.mako')
+        return render('/forum/posts.mako')

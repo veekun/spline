@@ -2,8 +2,10 @@
 
 <%def name="title()">${c.thread.subject} - ${c.thread.forum.name} - Forums</%def>
 
-<ul class="classic-list">
+<div class="forum-post-container">
     % for post in c.thread.posts:
-    <li><blockquote>${post.content}</blockquote></li>
+    <div class="forum-post">
+        <div class="content">${post.content}</div>
+    </div>
     % endfor
-</ul>
+</div>
