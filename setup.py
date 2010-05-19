@@ -4,7 +4,10 @@ setup(
     version = '0.1',
     packages = find_packages(),
 
-    install_requires = ['spline'],
+    install_requires = [
+        'spline',
+        'python-openid',
+    ],
 
     include_package_data = True,
 
