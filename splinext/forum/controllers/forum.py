@@ -4,6 +4,8 @@ from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
 from routes import request_config
 from sqlalchemy.orm.exc import NoResultFound
+import wtforms
+from wtforms import fields
 
 from spline.model import meta
 from spline.lib import helpers as h
@@ -11,6 +13,10 @@ from spline.lib.base import BaseController, render
 from splinext.forum import model as forum_model
 
 log = logging.getLogger(__name__)
+
+
+class WritePostForm(wtforms.Form):
+    content = fields.TextAreaField('Content')
 
 class ForumController(BaseController):
 
@@ -37,3 +43,46 @@ class ForumController(BaseController):
             abort(404)
 
         return render('/forum/posts.mako')
+
+
+    def write(self, forum_id, thread_id):
+        """Provides a form for posting to a thread."""
+        if not c.user.can('create_forum_post'):
+            abort(403)
+
+        try:
+            c.thread = meta.Session.query(forum_model.Thread) \
+                .filter_by(id=thread_id, forum_id=forum_id).one()
+        except NoResultFound:
+            abort(404)
+
+        c.form = WritePostForm(request.params)
+        c.write_mode = 'post'
+
+        if request.method != 'POST' or not c.form.validate():
+            # Failure or initial request; show the form
+            return render('/forum/write.mako')
+
+
+        # Otherwise, add the post.
+        c.thread = meta.Session.query(forum_model.Thread) \
+            .with_lockmode('update') \
+            .get(c.thread.id)
+
+        post = forum_model.Post(
+            position = c.thread.post_count + 1,
+            author_user_id = c.user.id,
+            content = c.form.content.data,
+        )
+
+        c.thread.posts.append(post)
+        c.thread.post_count += 1
+
+        meta.Session.commit()
+
+        # Redirect to the thread
+        # XXX probably to the post instead; anchor?  depends on paging scheme
+        h.flash('Your uniqueness has been added to our own.')
+        redirect_to(controller='forum', action='posts',
+            forum_id=forum_id, thread_id=thread_id,
+            _code=303)

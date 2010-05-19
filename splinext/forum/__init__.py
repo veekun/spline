@@ -9,9 +9,13 @@ import splinext.forum.controllers.forum
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
+    require_POST = dict(conditions=dict(method=['POST']))
+
     map.connect('/forums', controller='forum', action='forums')
     map.connect('/forums/{forum_id}', controller='forum', action='threads')
     map.connect('/forums/{forum_id}/threads/{thread_id}', controller='forum', action='posts')
+
+    map.connect('/forums/{forum_id}/threads/{thread_id}/write', controller='forum', action='write')
 
 
 class ForumPlugin(PluginBase):

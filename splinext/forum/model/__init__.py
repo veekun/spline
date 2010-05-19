@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import and_, Column, ForeignKey, Index
 from sqlalchemy.orm import relation
 from sqlalchemy.types import DateTime, Integer, Unicode
@@ -39,7 +41,7 @@ class Post(TableBase):
     thread_id = Column(Integer, ForeignKey('threads.id'), nullable=False)
     position = Column(Integer, nullable=False)
     author_user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    posted_time = Column(DateTime, nullable=False, index=True)
+    posted_time = Column(DateTime, nullable=False, index=True, default=datetime.now)
     content = Column(Unicode(5120), nullable=False)
 
 Index('thread_position', Post.thread_id, Post.position, unique=True)
