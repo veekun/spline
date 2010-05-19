@@ -9,6 +9,22 @@ from sqlalchemy.types import Integer, Unicode
 
 from spline.model.meta import TableBase
 
+class AnonymousUser(object):
+    """Fake user object, for when the user isn't actually logged in.
+
+    Tests as false and tries to respond to method calls the expected way.
+    """
+
+    def __nonzero__(self):
+        return False
+    def __bool__(self):
+        return False
+
+    def can(self, action):
+        # XXX if viewing is ever a permission, this should probably change.
+        return False
+
+
 class User(TableBase):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -23,6 +39,10 @@ class User(TableBase):
             kwargs['unique_identifier'] = ident
 
         super(User, self).__init__(*args, **kwargs)
+
+    def can(self, action):
+        # XXX this is probably not desired.
+        return True
 
     @property
     def unique_colors(self):

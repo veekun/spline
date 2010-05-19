@@ -31,9 +31,8 @@ def check_userid_hook(action, **params):
     c.
     """
 
-    c.user = None
-
     if not 'user_id' in session:
+        c.user = users_model.AnonymousUser()
         return
 
     user = meta.Session.query(users_model.User).get(session['user_id'])
@@ -41,6 +40,8 @@ def check_userid_hook(action, **params):
         # Bogus id in the session somehow.  Clear it
         del session['user_id']
         session.save()
+
+        c.user = users_model.AnonymousUser()
         return
 
     c.user = user
