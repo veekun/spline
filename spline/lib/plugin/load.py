@@ -25,7 +25,7 @@ def load_plugins(paths, extra_plugins={}):
     # TODO don't load any if this isn't specified!  loading everything by
     # default is dumb
     config_plugins = None
-    if 'plugins' in config['app_conf']:
+    if 'spline.plugins' in config['app_conf']:
         config_plugins = config['app_conf']['spline.plugins'].split()
 
     plugins = {}          # plugin_name => plugin
