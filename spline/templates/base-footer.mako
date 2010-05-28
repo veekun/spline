@@ -5,3 +5,6 @@
     ${c.timer.sql_queries} SQL quer${ 'y' if c.timer.sql_queries == 1 else 'ies' }
         in ${format_timedelta(c.timer.sql_time)} seconds
 </div>
+
+<p> Powered by Spline </p>
+<p> Fugue icon set by <a href="http://www.pinvoke.com/">Yusuke Kamiyamane</a>; country flags by <a href="http://www.famfamfam.com/lab/icons/flags/">famfamfam</a> </p>

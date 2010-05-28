@@ -61,10 +61,10 @@
  </div>
 </div>
 <div id="footer">
-    ## Allow easily overriding the timer; veekun wants to make it pretty
-    <%include file="/base-timer.mako" />
-    <p> Powered by Spline </p>
-    <p> Fugue icon set by <a href="http://www.pinvoke.com/">Yusuke Kamiyamane</a>; country flags by <a href="http://www.famfamfam.com/lab/icons/flags/">famfamfam</a> </p>
+    ## Unlike the header, which is made of distinct components, the footer is a
+    ## fairly arbitrary blob.  So, screw it, let deployments override the whole
+    ## shebang.
+    <%include file="/base-footer.mako" />
 </div>
 </body>
 </html>
