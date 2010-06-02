@@ -64,7 +64,10 @@ class BaseController(WSGIController):
         c.timer = ResponseTimer()
 
         c.links = config['spline.plugins.links']
-        c.javascripts = [('spline', 'lib/jquery-1.3.2.min')]
+        c.javascripts = [
+            ('spline', 'lib/jquery-1.3.2.min'),
+            ('spline', 'lib/jquery.cookies-2.2.0.min'),
+        ]
         run_hooks('before_controller', action, **params)
 
     def __call__(self, environ, start_response):
