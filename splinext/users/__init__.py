@@ -12,6 +12,13 @@ from splinext.users import model as users_model
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
+    def id_is_numeric(environ, result):
+        try:
+            int(result['id'])
+            return True
+        except (KeyError, ValueError):
+            return False
+
     # Login, logout
     map.connect('/accounts/login', controller='accounts', action='login')
     map.connect('/accounts/login_begin', controller='accounts', action='login_begin')
@@ -19,12 +26,15 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/accounts/logout', controller='accounts', action='logout')
 
     # Self-admin
-    map.connect('/users/{id};{name}/edit', controller='users', action='profile_edit')
+    map.connect('/users/{id};{name}/edit', controller='users', action='profile_edit',
+        conditions=dict(function=id_is_numeric))
 
     # Public user pages
     map.connect('/users', controller='users', action='list')
-    map.connect('/users/{id};{name}', controller='users', action='profile')
-    map.connect('/users/{id}', controller='users', action='profile')
+    map.connect('/users/{id};{name}', controller='users', action='profile',
+        conditions=dict(function=id_is_numeric))
+    map.connect('/users/{id}', controller='users', action='profile',
+        conditions=dict(function=id_is_numeric))
 
 def check_userid_hook(action, **params):
     """Hook to see if a user is logged in and, if so, stick a user object in
