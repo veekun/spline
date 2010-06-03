@@ -4,7 +4,7 @@ from migrate import *
 import migrate.changeset
 
 from sqlalchemy.ext.declarative import declarative_base
-TableBase = declarative_base(bind=migrate_engine)
+TableBase = declarative_base()
 
 
 class User(TableBase):
@@ -39,20 +39,24 @@ thread_position_idx = Index('thread_position', Post.thread_id, Post.position, un
 posted_time_idx = Index('ix_posts_posted_time', Post.posted_time)
 
 
-objects = [
-    Thread.__table__.c.icon,
-    Thread.__table__.c.post_count,
-    thread_post_count_idx,
-    Post.__table__.c.position,
-    Post.__table__.c.author_user_id,
-    thread_position_idx,
-    posted_time_idx,
-]
+def upgrade(migrate_engine):
+    TableBase.metadata.bind = migrate_engine
 
-def upgrade():
-    for obj in objects:
-        obj.create()
+    Thread.__table__.c.icon.create()
+    Thread.__table__.c.post_count.create()
+    thread_post_count_idx.create(bind=migrate_engine)
+    Post.__table__.c.position.create()
+    Post.__table__.c.author_user_id.create()
+    thread_position_idx.create(bind=migrate_engine)
+    posted_time_idx.create(bind=migrate_engine)
 
-def downgrade():
-    for obj in reversed(objects):
-        obj.drop()
+def downgrade(migrate_engine):
+    TableBase.metadata.bind = migrate_engine
+
+    posted_time_idx.drop(bind=migrate_engine)
+    thread_position_idx.drop(bind=migrate_engine)
+    Post.__table__.c.author_user_id.drop()
+    Post.__table__.c.position.drop()
+    thread_post_count_idx.drop(bind=migrate_engine)
+    Thread.__table__.c.post_count.drop()
+    Thread.__table__.c.icon.drop()

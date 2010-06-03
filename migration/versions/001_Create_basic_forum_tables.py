@@ -2,8 +2,7 @@ from sqlalchemy import *
 from migrate import *
 
 from sqlalchemy.ext.declarative import declarative_base
-TableBase = declarative_base(bind=migrate_engine)
-
+TableBase = declarative_base()
 
 class Forum(TableBase):
     __tablename__ = 'forums'
@@ -24,12 +23,14 @@ class Post(TableBase):
     content = Column(Unicode(5120), nullable=False)
 
 
-def upgrade():
+def upgrade(migrate_engine):
+    TableBase.bind = migrate_engine
     Forum.__table__.create()
     Thread.__table__.create()
     Post.__table__.create()
 
-def downgrade():
+def downgrade(migrate_engine):
+    TableBase.bind = migrate_engine
     Post.__table__.drop()
     Thread.__table__.drop()
     Forum.__table__.drop()
