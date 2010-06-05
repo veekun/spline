@@ -2,6 +2,13 @@
 
 <%def name="title()">${c.forum.name} - Forums</%def>
 
+<%def name="title_in_page()">
+<ul id="breadcrumbs">
+    <li><a href="${url(controller='forum', action='forums')}">Forums</a></li>
+    <li>${c.forum.name}</li>
+</ul>
+</%def>
+
 <table>
     % for thread in c.threads:
     <tr>
