@@ -18,6 +18,9 @@ log = logging.getLogger(__name__)
 class WritePostForm(wtforms.Form):
     content = fields.TextAreaField('Content')
 
+class WriteThreadForm(WritePostForm):
+    subject = fields.TextField('Subject')
+
 class ForumController(BaseController):
 
     def forums(self):
@@ -31,6 +34,8 @@ class ForumController(BaseController):
         except NoResultFound:
             abort(404)
 
+        c.write_thread_form = WriteThreadForm()
+
         c.threads = c.forum.threads
 
         return render('/forum/threads.mako')
@@ -42,8 +47,55 @@ class ForumController(BaseController):
         except NoResultFound:
             abort(404)
 
+        c.write_post_form = WritePostForm()
+
         return render('/forum/posts.mako')
 
+
+    def write_thread(self, forum_id):
+        """Provides a form for posting a new thread."""
+        if not c.user.can('create_forum_thread'):
+            abort(403)
+
+        try:
+            c.forum = meta.Session.query(forum_model.Forum) \
+                .filter_by(id=forum_id).one()
+        except NoResultFound:
+            abort(404)
+
+        c.write_thread_form = WriteThreadForm(request.params)
+
+        if request.method != 'POST' or not c.write_thread_form.validate():
+            # Failure or initial request; show the form
+            return render('/forum/write_thread.mako')
+
+
+        # Otherwise, add the post.
+        c.forum = meta.Session.query(forum_model.Forum) \
+            .with_lockmode('update') \
+            .get(c.forum.id)
+
+        thread = forum_model.Thread(
+            forum_id = c.forum.id,
+            subject = c.write_thread_form.subject.data,
+            post_count = 1,
+        )
+        post = forum_model.Post(
+            position = 1,
+            author_user_id = c.user.id,
+            content = c.write_thread_form.content.data,
+        )
+
+        thread.posts.append(post)
+        c.forum.threads.append(thread)
+
+        meta.Session.commit()
+
+        # Redirect to the new thread
+        h.flash("Contribution to the collective knowledge of the species successfully recorded.")
+        redirect_to(controller='forum', action='posts',
+            forum_id=forum_id, thread_id=thread.id,
+            _code=303)
 
     def write(self, forum_id, thread_id):
         """Provides a form for posting to a thread."""
@@ -56,10 +108,9 @@ class ForumController(BaseController):
         except NoResultFound:
             abort(404)
 
-        c.form = WritePostForm(request.params)
-        c.write_mode = 'post'
+        c.write_post_form = WritePostForm(request.params)
 
-        if request.method != 'POST' or not c.form.validate():
+        if request.method != 'POST' or not c.write_post_form.validate():
             # Failure or initial request; show the form
             return render('/forum/write.mako')
 
@@ -72,7 +123,7 @@ class ForumController(BaseController):
         post = forum_model.Post(
             position = c.thread.post_count + 1,
             author_user_id = c.user.id,
-            content = c.form.content.data,
+            content = c.write_post_form.content.data,
         )
 
         c.thread.posts.append(post)

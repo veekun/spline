@@ -15,6 +15,7 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/forums/{forum_id}', controller='forum', action='threads')
     map.connect('/forums/{forum_id}/threads/{thread_id}', controller='forum', action='posts')
 
+    map.connect('/forums/{forum_id}/write', controller='forum', action='write_thread')
     map.connect('/forums/{forum_id}/threads/{thread_id}/write', controller='forum', action='write')
 
 

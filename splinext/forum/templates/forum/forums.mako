@@ -2,6 +2,7 @@
 
 <%def name="title()">Forums</%def>
 
+<h1>Forums</h1>
 <table class="forum-list striped-rows">
 <thead>
     <tr class="header-row">

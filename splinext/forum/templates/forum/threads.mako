@@ -1,4 +1,5 @@
 <%inherit file="/base.mako" />
+<%namespace name="forumlib" file="/forum/lib.mako" />
 
 <%def name="title()">${c.forum.name} - Forums</%def>
 
@@ -25,3 +26,5 @@
     % endfor
 </tbody>
 </table>
+
+${forumlib.write_thread_form(c.forum)}
