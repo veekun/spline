@@ -13,21 +13,8 @@
 
 % if c.thread.post_count == 0:
 <p>Something terribly bogus has happened; this thread has no posts.</p>
-<% return %>
+% else:
+${forumlib.posts(c.thread.posts)}
 % endif
-
-<div class="forum-post-container">
-    % for post in c.thread.posts:
-    <div class="forum-post">
-        <div class="author">
-            ${post.author.name}
-        </div>
-        <div class="meta">
-            <time>${post.posted_time}</time>
-        </div>
-        <div class="content">${post.content}</div>
-    </div>
-    % endfor
-</div>
 
 ${forumlib.write_post_form(c.thread)}
