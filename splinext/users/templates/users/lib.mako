@@ -5,3 +5,9 @@
     % endfor
 </span>\
 </%def>
+
+## XXX support user emails, oops
+<%def name="avatar(user)">\
+<%! import hashlib %>\
+<img src="http://www.gravatar.com/avatar/${hashlib.md5(str(user.id)).hexdigest()}?r=x&amp;s=96&amp;d=identicon">\
+</%def>
