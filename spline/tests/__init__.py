@@ -7,6 +7,20 @@ command.
 This module initializes the application via ``websetup`` (`paster
 setup-app`) and provides the base testing objects.
 """
+
+# Shiv to make Unicode test docstrings print correctly; forces stderr to be
+# utf8 (or whatever LANG says)
+import locale, unittest
+enc = locale.getpreferredencoding()
+def new_writeln(self, arg=None):
+    if arg:
+        if isinstance(arg, unicode):
+            self.write(arg.encode(enc))
+        else:
+            self.write(arg)
+    self.write('\n')
+unittest._WritelnDecorator.writeln = new_writeln
+
 from unittest import TestCase
 
 from paste.deploy import loadapp
