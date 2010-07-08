@@ -3,7 +3,7 @@
 
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import fields, widgets, ValidationError
-from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
 
 class FakeMultiDict(dict):
@@ -100,6 +100,16 @@ class MultiCheckboxField(fields.SelectMultipleField):
     widget = widgets.ListWidget(prefix_label=False)
     option_widget = widgets.CheckboxInput()
 
+
+class QueryRadioSelectField(QuerySelectField):
+    """
+    Works the same as a QuerySelectField, except using radio buttons
+    rather than a selectbox.
+
+    Iterating over the field yields the radio subfields.
+    """
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.RadioInput()
 
 class QueryCheckboxSelectMultipleField(QuerySelectMultipleField):
     """
