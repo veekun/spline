@@ -79,7 +79,9 @@ class BaseController(WSGIController):
             return WSGIController.__call__(self, environ, start_response)
         finally:
             meta.Session.remove()
-            run_hooks('after_controller')
+
+    def __after__(self, **params):
+        run_hooks('after_controller', **params)
 
     def cache_content(self, key, do_work, template):
         """Argh!

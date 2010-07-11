@@ -38,6 +38,8 @@
     ${recursive_menu(c.links)}
 </div>
 
+<%include file="/widgets.mako" args="widget='before_content'"/>
+
 <% flash = h._flash.pop_messages() %>
 % if flash:
 <ul id="flash">

@@ -12,12 +12,11 @@ import re
 
 
 _flash = Flash()
-def flash(message, icon=None):
+def flash(message, icon=None, **extras):
     """Custom add-to-flash function that supports remembering an optional icon
     per message.
     """
     # Messages are stored as (message, dict_of_extra_stuff)
-    extras = dict()
     if icon:
         extras['icon'] = icon
 
