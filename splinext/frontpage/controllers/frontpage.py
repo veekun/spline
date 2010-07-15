@@ -25,8 +25,9 @@ class FrontPageController(BaseController):
         # return value a list of lists
         updates_lol = run_hooks('frontpage_updates', limit=10)
         updates = sum(updates_lol, [])
-        updates.sort(key=lambda obj: obj.time)
 
+        updates.sort(key=lambda obj: obj.time)
+        updates.reverse()
         c.updates = updates[0:10]
 
         return render('/index.mako')
