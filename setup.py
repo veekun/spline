@@ -6,6 +6,7 @@ setup(
 
     install_requires = [
         'spline',
+        'feedparser',
     ],
 
     include_package_data = True,
