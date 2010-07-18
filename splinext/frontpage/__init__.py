@@ -25,7 +25,7 @@ RSS_SUMMARY_LENGTH = 1000
 FrontPageRSS = namedtuple('FrontPageRSS',
     ['time', 'entry', 'template', 'category', 'content', 'icon'])
 
-def rss_hook(limit, url, title=None, icon=None):
+def rss_hook(limit, max_age, url, title=None, icon=None):
     """Front page handler for news feeds."""
     feed = feedparser.parse(url)
 
@@ -41,6 +41,11 @@ def rss_hook(limit, url, title=None, icon=None):
         except AttributeError:
             timestamp_tuple = entry.updated_parsed
         timestamp = datetime.datetime(*timestamp_tuple[:6])
+
+        if max_age and timestamp < max_age:
+            # Entries should be oldest-first, so we can bail after the first
+            # expired entry
+            break
 
         # Try to find something to show!  Default to the summary, if there is
         # one, or try to generate one otherwise
@@ -97,7 +102,7 @@ FrontPageGit = namedtuple('FrontPageGit',
 FrontPageGitCommit = namedtuple('FrontPageGitCommit',
     ['hash', 'author', 'time', 'subject', 'repo'])
 
-def git_hook(limit, title, gitweb, repo_paths, repo_names,
+def git_hook(limit, max_age, title, gitweb, repo_paths, repo_names,
     tag_pattern=None, icon=None):
 
     """Front page handler for repository history."""
@@ -127,6 +132,22 @@ def git_hook(limit, title, gitweb, repo_paths, repo_names,
 
     updates = []
     for tag, since_tag in zip(interesting_tags, tags[1:]):
+        # Get the date when this tag was actually created
+        args = [
+            'git',
+            '--git-dir=' + repo_paths[0],
+            'for-each-ref',
+            '--format=%(taggerdate:raw)',
+            'refs/tags/' + tag,
+        ]
+        tag_timestamp, _ = subprocess.Popen(args, stdout=subprocess.PIPE) \
+            .communicate()
+        tag_unixtime, tag_timezone = tag_timestamp.split(None, 1)
+        tagged_timestamp = datetime.datetime.fromtimestamp(int(tag_unixtime))
+
+        if max_age and tagged_timestamp < max_age:
+            break
+
         commits = []
 
         for repo_path, repo_name in zip(repo_paths, repo_names):
@@ -152,19 +173,8 @@ def git_hook(limit, title, gitweb, repo_paths, repo_names,
                     )
                 )
 
-        # LASTLY, get the date when this tag was actually created
-        args = [
-            'git',
-            'for-each-ref',
-            '--format=%(taggerdate:raw)',
-            'refs/tags/' + tag,
-        ]
-        tag_timestamp, _ = subprocess.Popen(args, stdout=subprocess.PIPE) \
-            .communicate()
-        tag_unixtime, tag_timezone = tag_timestamp.split(None, 1)
-
         update = FrontPageGit(
-            time = datetime.datetime.fromtimestamp(int(tag_unixtime)),
+            time = tagged_timestamp,
             gitweb = gitweb,
             log = commits,
             template = '/front_page/git.mako',

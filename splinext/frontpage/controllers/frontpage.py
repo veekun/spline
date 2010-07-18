@@ -1,4 +1,5 @@
 from collections import defaultdict
+import datetime
 import logging
 import re
 
@@ -26,8 +27,13 @@ class FrontPageController(BaseController):
 
         Hook handlers should return a list of FrontPageUpdate objects.
 
-        Standard hook parameters are `limit`, the maximum number of items that
-        should ever be returned.
+        Standard hook parameters are:
+        `limit`, the maximum number of items that should ever be returned.
+        `max_age`, the number of seconds after which items expire.
+        `title`, a name for the source.
+        `icon`, an icon to show next to its name.
+
+        `limit` and `max_age` are also global options.
 
         Updates are configured in the .ini like so:
 
@@ -39,9 +45,6 @@ class FrontPageController(BaseController):
         grouping options together.  This will result in a call to:
 
             run_hooks('frontpage_updates_updatetype', opt1=val1, opt2=val2)
-
-        Standard options are not shown and take precedence over whatever's in
-        the config file.
 
         Local plugins can override the fairly simple index.mako template to
         customize the front page layout.
@@ -60,29 +63,58 @@ class FrontPageController(BaseController):
                 # This is the type declaration; use a special key
                 subkey = '__type__'
 
+            if subkey in ('limit', 'max_age'):
+                val = int(val)
             update_config[source_name][subkey] = val
 
-
-        global_config = dict(
-            limit = 10,
-        )
+        global_limit = int(config.get('spline-frontpage.limit', 10))
+        now = datetime.datetime.now()
+        try:
+            global_max_age = now - datetime.timedelta(
+                seconds=int(config['spline-frontpage.max_age']))
+        except KeyError:
+            global_max_age = None
 
         # Ask plugins to deal with this stuff for us!
         updates = []
         for source, source_config in update_config.iteritems():
-            source_config2 = source_config.copy()
-            hook_name = 'frontpage_updates_' + source_config2.pop('__type__')
-            source_config2.update(global_config)
+            hook_name = 'frontpage_updates_' + source_config['__type__']
 
-            # Hooks should return a list of FrontPageUpdate objects, making this
-            # return value a list of lists
-            updates_lol = run_hooks(hook_name, **source_config2)
+            # Merge with the global config
+            merged_config = source_config.copy()
+            del merged_config['__type__']
+
+            merged_config['limit'] = min(
+                merged_config.get('limit', global_limit),
+                global_limit,
+            )
+
+            try:
+                local_max_age = now - datetime.timedelta(
+                    seconds=merged_config['max_age'])
+            except KeyError:
+                local_max_age = None
+
+            if global_max_age and local_max_age:
+                merged_config['max_age'] = max(global_max_age, local_max_age)
+            else:
+                merged_config['max_age'] = global_max_age or local_max_age
+
+            # Hooks should return a list of FrontPageUpdate-like objects,
+            # making this return value a list of lists
+            updates_lol = run_hooks(hook_name, **merged_config)
             updates += sum(updates_lol, [])
 
-        # Sort everything by descending time, then crop to the right number of
-        # items
-        updates.sort(key=lambda obj: obj.time)
-        updates.reverse()
-        c.updates = updates[:global_config['limit']]
+            # Little optimization: maximum age effectively becomes the age of
+            # the oldest thing that would still appear on the page, as anything
+            # older would drop off the end no matter what.
+            # So sort by descending time and crop each iteration...
+            updates.sort(key=lambda obj: obj.time, reverse=True)
+            updates = updates[:global_limit]
+
+            if updates:
+                global_max_age = updates[-1].time
+
+        c.updates = updates
 
         return render('/index.mako')
