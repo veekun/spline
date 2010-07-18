@@ -7,6 +7,7 @@ setup(
     install_requires = [
         'spline',
         'feedparser',
+        'lxml',
     ],
 
     include_package_data = True,

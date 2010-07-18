@@ -4,6 +4,7 @@ from pkg_resources import resource_filename
 import subprocess
 
 import feedparser
+import lxml.html
 
 from spline.lib import helpers
 from spline.lib.plugin import PluginBase, PluginLink, Priority
@@ -19,27 +20,67 @@ class FrontPageUpdate(object):
     pass
 
 
+RSS_SUMMARY_LENGTH = 1000
+
 FrontPageRSS = namedtuple('FrontPageRSS',
     ['time', 'entry', 'template', 'category', 'content', 'icon'])
 
-def rss_hook(limit, url, title, icon=None):
+def rss_hook(limit, url, title=None, icon=None):
     """Front page handler for news feeds."""
     feed = feedparser.parse(url)
 
+    if not title:
+        title = feed.feed.title
+
     updates = []
-    for entry in feed.entries:
+    for entry in feed.entries[:limit]:
+        # Grab a date -- Atom has published, RSS usually just has updated.
+        # Both come out as time tuples, which datetime.datetime() can read
+        try:
+            timestamp_tuple = entry.published_parsed
+        except AttributeError:
+            timestamp_tuple = entry.updated_parsed
+        timestamp = datetime.datetime(*timestamp_tuple[:6])
+
         # Try to find something to show!  Default to the summary, if there is
         # one, or try to generate one otherwise
         content = u''
         if 'summary' in entry:
+            # If there be a summary, cheerfully trust that it's actually a
+            # summary
             content = entry.summary
         elif 'content' in entry:
-            content = entry.content[0].value
+            # Full content is way too much, especially for my giant blog posts.
+            # Cut this down to some arbitrary number of characters, then feed
+            # it to lxml.html to fix tag nesting
+            broken_html = entry.content[0].value[:RSS_SUMMARY_LENGTH]
+            fragment = lxml.html.fromstring(broken_html)
+
+            # Insert an ellipsis at the end of the last node with text
+            last_text_node = None
+            last_tail_node = None
+            # Need to find the last node with a tail, OR the last node with
+            # text if it's later
+            for node in fragment.iter():
+                if node.tail:
+                    last_tail_node = node
+                    last_text_node = None
+                elif node.text:
+                    last_text_node = node
+                    last_tail_node = None
+
+            if last_text_node is not None:
+                last_text_node.text += '...'
+            if last_tail_node is not None:
+                last_tail_node.tail += '...'
+
+            # Serialize
+            content = lxml.html.tostring(fragment)
 
         content = helpers.literal(content)
 
         update = FrontPageRSS(
-            time = datetime.datetime(*entry.published_parsed[:6]),
+            time = timestamp,
             entry = entry,
             template = '/front_page/rss.mako',
             category = title,
