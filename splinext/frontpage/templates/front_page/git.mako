@@ -2,7 +2,9 @@
 
 <div class="frontpage-update">
     <div class="header">
-        <div class="category"><img src="${h.static_uri('spline', "icons/{0}.png".format('gear--pencil'))}" alt=""> ${update.category}:</div>
+        <div class="category">
+            <a href="${update.source.link}"><img src="${h.static_uri('spline', "icons/{0}.png".format(update.source.icon))}" alt=""> ${update.source.title}</a>:
+        </div>
         <div class="date">${update.time}</div>
         <div class="title">${update.tag}</div>
     </div>
@@ -17,7 +19,7 @@
             % endif
 
             <tr>
-                <td class="hash"><a href="${update.gitweb}?p=${commit.repo}.git;a=commit;h=${commit.hash}">${commit.hash}</a></td>
+                <td class="hash"><a href="${update.source.gitweb}?p=${commit.repo}.git;a=commit;h=${commit.hash}">${commit.hash}</a></td>
                 <td class="author">${commit.author}</td>
                 <td class="subject">${commit.subject}</td>
                 <td class="time">${commit.time}</td>

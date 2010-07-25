@@ -100,10 +100,10 @@ class FrontPageController(BaseController):
             else:
                 merged_config['max_age'] = global_max_age or local_max_age
 
-            # Hooks should return a list of FrontPageUpdate-like objects,
-            # making this return value a list of lists
+            # XXX bleh
             updates_lol = run_hooks(hook_name, **merged_config)
-            updates += sum(updates_lol, [])
+            source_obj = updates_lol[0]
+            updates += source_obj.poll(merged_config['limit'], merged_config['max_age'])
 
             # Little optimization: maximum age effectively becomes the age of
             # the oldest thing that would still appear on the page, as anything
@@ -112,7 +112,7 @@ class FrontPageController(BaseController):
             updates.sort(key=lambda obj: obj.time, reverse=True)
             updates = updates[:global_limit]
 
-            if updates:
+            if updates and len(updates) == global_limit:
                 global_max_age = updates[-1].time
 
         c.updates = updates

@@ -4,5 +4,5 @@
 
 <h1>Updates</h1>
 % for update in c.updates:
-<%include file="${update.template}" args="update=update" />
+<%include file="${update.source.template}" args="update=update" />
 % endfor

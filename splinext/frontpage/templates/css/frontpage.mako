@@ -2,6 +2,7 @@
 .frontpage-update:nth-child(2n) { background: #f0f0f0; }
 .frontpage-update .header { white-space: nowrap; padding: 0.5em 1em; border: 1px solid #b4c7e6; background: url(${h.static_uri('local', 'images/layout/th-background.png')}) left bottom repeat-x; -moz-border-radius-topleft: 1em; -moz-border-radius-topright: 1em; -webkit-border-top-left-radius: 0.5em; -webkit-border-top-right-radius: 0.5em; }
 .frontpage-update .header .category { float: left; font-size: 1.33em; margin-right: 0.25em; font-style: italic; color: #404040; vertical-align: bottom; }
+.frontpage-update .header .category a { font-weight: normal; }
 .frontpage-update .header .category img { vertical-align: bottom; }
 .frontpage-update .header .date { float: right; white-space: nowrap; line-height: 1.33; margin-left: 0.33em; vertical-align: bottom; }
 .frontpage-update .header .title { overflow: hidden; font-size: 1.33em; height: 1em; vertical-align: bottom; text-overflow: ellipsis; font-weight: bold; color: #303030; }
