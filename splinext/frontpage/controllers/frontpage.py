@@ -1,7 +1,4 @@
-from collections import defaultdict
-import datetime
 import logging
-import re
 
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect_to
@@ -10,7 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from spline.lib import helpers as h
 from spline.lib.base import BaseController, render
-from spline.lib.plugin.load import run_hooks
+from splinext.frontpage.sources import max_age_to_datetime
 
 log = logging.getLogger(__name__)
 
@@ -49,72 +46,26 @@ class FrontPageController(BaseController):
         Local plugins can override the fairly simple index.mako template to
         customize the front page layout.
         """
-        # XXX no reason to do this on the fly; cache it on server startup
-        update_config = defaultdict(dict)  # source_name => config
-        key_rx = re.compile(
-            '(?x) ^ spline-frontpage [.] sources [.] (\w+) (?: [.] (\w+) )? $')
-        for key, val in config.iteritems():
-            match = key_rx.match(key)
-            if not match:
-                continue
 
-            source_name, subkey = match.groups()
-            if not subkey:
-                # This is the type declaration; use a special key
-                subkey = '__type__'
-
-            if subkey in ('limit', 'max_age'):
-                val = int(val)
-            update_config[source_name][subkey] = val
-
-        global_limit = int(config.get('spline-frontpage.limit', 10))
-        now = datetime.datetime.now()
-        try:
-            global_max_age = now - datetime.timedelta(
-                seconds=int(config['spline-frontpage.max_age']))
-        except KeyError:
-            global_max_age = None
-
-        # Ask plugins to deal with this stuff for us!
         updates = []
-        for source, source_config in update_config.iteritems():
-            hook_name = 'frontpage_updates_' + source_config['__type__']
+        global_limit = config['spline-frontpage.limit']
+        global_max_age = max_age_to_datetime(
+            config['spline-frontpage.max_age'])
 
-            # Merge with the global config
-            merged_config = source_config.copy()
-            del merged_config['__type__']
+        for source in config['spline-frontpage.sources']:
+            new_updates = source.poll(global_limit, global_max_age)
+            updates.extend(new_updates)
 
-            merged_config['limit'] = min(
-                merged_config.get('limit', global_limit),
-                global_limit,
-            )
-
-            try:
-                local_max_age = now - datetime.timedelta(
-                    seconds=merged_config['max_age'])
-            except KeyError:
-                local_max_age = None
-
-            if global_max_age and local_max_age:
-                merged_config['max_age'] = max(global_max_age, local_max_age)
-            else:
-                merged_config['max_age'] = global_max_age or local_max_age
-
-            # XXX bleh
-            updates_lol = run_hooks(hook_name, **merged_config)
-            source_obj = updates_lol[0]
-            updates += source_obj.poll(merged_config['limit'], merged_config['max_age'])
-
-            # Little optimization: maximum age effectively becomes the age of
-            # the oldest thing that would still appear on the page, as anything
-            # older would drop off the end no matter what.
-            # So sort by descending time and crop each iteration...
+            # Little optimization: once there are global_limit items, anything
+            # older than the oldest cannot possibly make it onto the list.  So,
+            # bump global_max_age to that oldest time if this is ever the case.
             updates.sort(key=lambda obj: obj.time, reverse=True)
-            updates = updates[:global_limit]
+            del updates[global_limit:]
 
             if updates and len(updates) == global_limit:
                 global_max_age = updates[-1].time
 
+        # Done!  Feed to template
         c.updates = updates
 
         return render('/index.mako')

@@ -12,6 +12,16 @@ import lxml.html
 
 from spline.lib import helpers
 
+def max_age_to_datetime(max_age):
+    """``max_age`` is specified in config as a number of seconds old.  This
+    function takes that number and returns a corresponding datetime object.
+    """
+    if max_age == None:
+        return None
+
+    seconds = int(max_age)
+
+
 
 class Source(object):
     """Represents a source to be polled for updates.  Sources are populated
@@ -44,12 +54,28 @@ class Source(object):
         self.title = title
         self.icon = icon
         self.link = link
-        self.limit = limit
-        self.max_age = max_age
+        self.limit = int(limit)
+        self.max_age = max_age_to_datetime(max_age)
 
-    def poll(self):
-        """Poll for updates.  Must return an iterable.  Each element should be
-        an Update object.
+    def poll(self, global_limit, global_max_age):
+        """Public wrapper that takes care of reconciling global and source item
+        limit and max age.
+
+        Subclasses should implement ``_poll``, below.
+        """
+        # Smallest limit wins
+        limit = min(self.limit, global_limit)
+
+        # Latest max age wins.  Note that either could be None, but that's
+        # fine, because None is less than everything else
+        max_age = max(self.max_age, global_max_age)
+
+        return self._poll(limit, max_age)
+
+    def _poll(self, limit, max_age):
+        """Implementation of polling for updates.  Must return an iterable.
+        Each element should be an object with ``source`` and ``time``
+        properties.  A namedtuple works well.
         """
         raise NotImplementedError
 
@@ -74,7 +100,7 @@ class FeedSource(Source):
 
         self.feed_url = feed_url
 
-    def poll(self, limit, max_age):
+    def _poll(self, limit, max_age):
         feed = feedparser.parse(self.feed_url)
 
         if not self.title:
@@ -187,8 +213,7 @@ class GitSource(Source):
         self.gitweb = gitweb
         self.tag_pattern = tag_pattern
 
-    def poll(self, limit, max_age):
-
+    def _poll(self, limit, max_age):
         # Fetch the main repo's git tags
         git_dir = '--git-dir=' + self.repo_paths[0]
         args = [
