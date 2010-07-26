@@ -7,7 +7,7 @@
 </%def>
 
 ## XXX support user emails, oops
-<%def name="avatar(user)">\
+<%def name="avatar(user, size=96)">\
 <%! import hashlib %>\
-<img src="http://www.gravatar.com/avatar/${hashlib.md5(str(user.id)).hexdigest()}?r=x&amp;s=96&amp;d=identicon">\
+<img src="http://www.gravatar.com/avatar/${hashlib.md5(str(user.id)).hexdigest()}?r=x&amp;s=${size}&amp;d=identicon" alt="${user.name}'s avatar" title="${user.name}">\
 </%def>
