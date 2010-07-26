@@ -53,6 +53,7 @@ def make_map(content_dirs=[]):
     map.connect('/error/{action}/{id}', controller='error')
 
     map.connect('/css', controller='main', action='css')
+    map.connect('/cron', controller='main', action='cron')
 
     # Allow plugins to map routes without the below defaults clobbering them
     run_hooks('routes_mapping', map=map)

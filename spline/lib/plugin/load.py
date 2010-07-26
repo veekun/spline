@@ -132,15 +132,18 @@ def run_hooks(_spline_hook_name, *args, **kwargs):
 
     if not _spline_hook_name in all_hooks:
         # No hooks; bail
-        return
+        return []
     hooks = all_hooks[_spline_hook_name]
 
+    results = []
     for priority in [1, 2, 3, 4, 5]:
         if not priority in hooks:
             # Nothing for this priority; bail
             continue
 
         for function in hooks[priority]:
-            function(*args, **kwargs)
+            result = function(*args, **kwargs)
+            if result != None:
+                results.append(result)
 
-    return
+    return results

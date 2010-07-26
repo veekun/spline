@@ -55,7 +55,6 @@ class PluginLink(object):
         if url:
             self.url_lookup[url] = self
 
-
 class PluginBase(object):
     """Base object for spline plugins.  Plugins should advertise a subclass of
     this class as an entry point.
