@@ -10,6 +10,8 @@ from subprocess import PIPE
 import feedparser
 import lxml.html
 
+from pylons import cache
+
 from spline.lib import helpers
 
 def max_age_to_datetime(max_age):
@@ -57,6 +59,9 @@ class Source(object):
         self.limit = int(limit)
         self.max_age = max_age_to_datetime(max_age)
 
+    def do_cron(self, *args, **kwargs):
+        return
+
     def poll(self, global_limit, global_max_age):
         """Public wrapper that takes care of reconciling global and source item
         limit and max age.
@@ -79,9 +84,55 @@ class Source(object):
         """
         raise NotImplementedError
 
+class CachedSource(Source):
+    """Supports caching a source's updates in memcache.
+
+    On the surface, this functions just like any other ``Source``.  Calling
+    ``poll`` still returns a list of updates.  However, ``poll`` does not call
+    your ``_poll``; instead, your implementation is called by the spline cron,
+    and the results are cached.  ``poll`` then returns the contents of the
+    cache.
+
+    You must define a ``_cache_key`` method that returns a key uniquely
+    identifying this object.  Your key will be combined with the class name, so
+    it only needs to be unique for that source, not globally.
+
+    You may also override ``poll_frequency``, the number of minutes between
+    pollings.  By default, this is a rather conservative 60.
+
+    Note that it may take up to a minute after server startup for updates
+    from a cached source to appear.
+    """
+
+    poll_frequency = 60
+
+    def cache_key(self):
+        return repr(type(self)) + ':' + self._cache_key()
+
+    def _cache_key(self):
+        raise NotImplementedError
+
+    def do_cron(self, tic, *args, **kwargs):
+        if tic % self.poll_frequency != 0:
+            # Too early!
+            return
+
+        updates = self._poll(self.limit, self.max_age)
+        cache.get_cache('spline-frontpage')[self.cache_key()] = updates
+
+        return
+
+    def poll(self, global_limit, global_max_age):
+        """Fetches cached updates."""
+        try:
+            return cache.get_cache('spline-frontpage')[self.cache_key()]
+        except KeyError:
+            # Haven't cached anything yet, apparently
+            return []
+
 
 FrontPageRSS = namedtuple('FrontPageRSS', ['source', 'time', 'entry', 'content'])
-class FeedSource(Source):
+class FeedSource(CachedSource):
     """Represents an RSS or Atom feed.
 
     Extra properties:
@@ -94,11 +145,16 @@ class FeedSource(Source):
 
     SUMMARY_LENGTH = 1000
 
+    poll_frequency = 15
+
     def __init__(self, feed_url, **kwargs):
         kwargs.setdefault('title', None)
         super(FeedSource, self).__init__(**kwargs)
 
         self.feed_url = feed_url
+
+    def _cache_key(self):
+        return self.feed_url
 
     def _poll(self, limit, max_age):
         feed = feedparser.parse(self.feed_url)
@@ -173,7 +229,7 @@ FrontPageGit = namedtuple('FrontPageGit', ['source', 'time', 'log', 'tag'])
 FrontPageGitCommit = namedtuple('FrontPageGitCommit',
     ['hash', 'author', 'time', 'subject', 'repo'])
 
-class GitSource(Source):
+class GitSource(CachedSource):
     """Represents a git repository.
 
     The main repository is checked for annotated tags, and an update is
@@ -212,6 +268,9 @@ class GitSource(Source):
 
         self.gitweb = gitweb
         self.tag_pattern = tag_pattern
+
+    def _cache_key(self):
+        return self.repo_paths[0]
 
     def _poll(self, limit, max_age):
         # Fetch the main repo's git tags

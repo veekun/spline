@@ -66,6 +66,12 @@ def load_sources_hook(*args, **kwargs):
     # Save the list of sources, and done
     config['spline-frontpage.sources'] = sources
 
+def source_cron_hook(*args, **kwargs):
+    """Hook to pass on cron tics to all sources, should they need it for e.g.
+    caching.
+    """
+    for source in config['spline-frontpage.sources']:
+        source.do_cron(*args, **kwargs)
 
 class FrontPagePlugin(PluginBase):
     def controllers(self):
@@ -82,6 +88,7 @@ class FrontPagePlugin(PluginBase):
         return [
             ('routes_mapping',          Priority.NORMAL,    add_routes_hook),
             ('after_setup',             Priority.NORMAL,    load_sources_hook),
+            ('cron',                    Priority.NORMAL,    source_cron_hook),
             ('frontpage_updates_rss',   Priority.NORMAL,    FeedSource),
             ('frontpage_updates_git',   Priority.NORMAL,    GitSource),
         ]
