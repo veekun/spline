@@ -52,7 +52,8 @@ class FrontPageController(BaseController):
         global_max_age = max_age_to_datetime(
             config['spline-frontpage.max_age'])
 
-        for source in config['spline-frontpage.sources']:
+        c.sources = config['spline-frontpage.sources']
+        for source in c.sources:
             new_updates = source.poll(global_limit, global_max_age)
             updates.extend(new_updates)
 

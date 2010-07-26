@@ -1,8 +1,6 @@
 <%inherit file="base.mako" />
 
-<%def name="title()">Home</%def>
+<%def name="title()">Updates</%def>
 
 <h1>Updates</h1>
-% for update in c.updates:
-<%include file="${update.source.template}" args="update=update" />
-% endfor
+<%include file="/front_page/updates.mako" />
