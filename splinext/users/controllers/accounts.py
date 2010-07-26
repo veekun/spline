@@ -1,5 +1,5 @@
 import logging
-from openid.consumer.consumer import Consumer
+from openid.consumer.consumer import Consumer, SUCCESS, CANCEL
 from openid.extensions.sreg import SRegRequest, SRegResponse
 from openid.store.filestore import FileOpenIDStore
 from openid.yadis.discover import DiscoveryFailure
@@ -69,7 +69,11 @@ class AccountsController(BaseController):
         return_url = url(host=host, controller='accounts', action='login_finish')
         res = cons.complete(request.params, return_url)
 
-        if res.status != 'success':
+        if res.status == CANCEL:
+            # I guess..  just..  back to the homepage?
+            h.flash(u"""Login canceled.""", icon='user-silhouette')
+            redirect_to(url('/'))
+        elif res.status != SUCCESS:
             return 'Error!  %s' % res.message
 
         try:
