@@ -21,8 +21,10 @@ def max_age_to_datetime(max_age):
     if max_age == None:
         return None
 
-    seconds = int(max_age)
+    dt = datetime.datetime.now()
+    dt -= datetime.timedelta(seconds=int(max_age))
 
+    return dt
 
 
 class Source(object):
