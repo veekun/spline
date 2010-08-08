@@ -1,0 +1,4 @@
+## encoding: utf8
+#-- Users plugin
+# id of the root user, who can automatically do anything
+#spline-users.root_user_id = 0
