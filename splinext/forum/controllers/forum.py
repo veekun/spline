@@ -54,7 +54,7 @@ class ForumController(BaseController):
 
     def write_thread(self, forum_id):
         """Provides a form for posting a new thread."""
-        if not c.user.can('create_forum_thread'):
+        if not c.user.can('forum:create-thread'):
             abort(403)
 
         try:
@@ -99,7 +99,7 @@ class ForumController(BaseController):
 
     def write(self, forum_id, thread_id):
         """Provides a form for posting to a thread."""
-        if not c.user.can('create_forum_post'):
+        if not c.user.can('forum:create-post'):
             abort(403)
 
         try:

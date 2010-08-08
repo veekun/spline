@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import and_, Column, ForeignKey, Index
 from sqlalchemy.orm import relation
-from sqlalchemy.types import DateTime, Integer, Unicode
+from sqlalchemy.types import DateTime, Enum, Integer, Unicode
 
 from spline.model.meta import TableBase
 from splinext.users import model as users_model
@@ -14,6 +14,24 @@ class Forum(TableBase):
     __tablename__ = 'forums'
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     name = Column(Unicode(133), nullable=False)
+    access_level = Column(Enum(u'normal', u'soapbox', u'archive', name='forums_access_level'), nullable=False, default=u'normal', server_default=u'normal')
+
+    def can_create_thread(self, user):
+        """Returns True ifff the named user can make a new thread in this
+        forum.
+        """
+        if not user.can('forum:create-thread'):
+            return False
+
+        if self.access_level == u'soapbox' and \
+            not user.can('forum:override-soapbox'):
+            return False
+
+        if self.access_level == u'archive' and \
+            not user.can('forum:override-archive'):
+            return False
+
+        return True
 
 class Thread(TableBase):
     __tablename__ = 'threads'
@@ -34,6 +52,18 @@ class Thread(TableBase):
             position = self.post_count + position + 1
 
         return self.posts.filter_by(position=position).one()
+
+    def can_create_post(self, user):
+        """Returns True ifff the named user can make a new post in this thread.
+        """
+        if not user.can('forum:create-post'):
+            return False
+
+        if self.forum.access_level == u'archive' and \
+            not user.can('forum:override-archive'):
+            return False
+
+        return True
 
 class Post(TableBase):
     __tablename__ = 'posts'

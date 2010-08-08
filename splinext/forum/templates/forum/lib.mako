@@ -26,7 +26,7 @@
 </%def>
 
 <%def name="write_thread_form(forum)">
-% if c.user.can('create_forum_thread'):
+% if forum.can_create_thread(c.user):
 <h1>Create new thread</h1>
 ${h.form(url(controller='forum', action='write_thread', forum_id=forum.id))}
 <dl class="standard-form">
@@ -40,7 +40,7 @@ ${h.end_form()}
 </%def>
 
 <%def name="write_post_form(thread)">
-% if c.user.can('create_forum_post'):
+% if thread.can_create_post(c.user):
 <h1>Reply</h1>
 ${h.form(url(controller='forum', action='write', forum_id=thread.forum.id, thread_id=thread.id))}
 <dl class="standard-form">
