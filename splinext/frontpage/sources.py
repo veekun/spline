@@ -6,6 +6,7 @@ from collections import namedtuple
 import datetime
 import subprocess
 from subprocess import PIPE
+from urllib2 import URLError
 
 import feedparser
 import lxml.html
@@ -119,8 +120,13 @@ class CachedSource(Source):
             # Too early!
             return
 
-        updates = self._poll(self.limit, self.max_age)
-        cache.get_cache('spline-frontpage')[self.cache_key()] = updates
+        try:
+            updates = self._poll(self.limit, self.max_age)
+            cache.get_cache('spline-frontpage')[self.cache_key()] = updates
+        except Exception:
+            # Hmm, polling broke.  Be conservative and don't do anything; old
+            # data is probably still OK for now
+            pass
 
         return
 
@@ -160,6 +166,11 @@ class FeedSource(CachedSource):
 
     def _poll(self, limit, max_age):
         feed = feedparser.parse(self.feed_url)
+
+        if feed.bozo and isinstance(feed.bozo_exception, URLError):
+            # Feed is DOWN.  Bail here; otherwise, old entries might be lost
+            # just because, say, Bulbanews is down yet again
+            raise feed.bozo_exception
 
         if not self.title:
             self.title = feed.feed.title
