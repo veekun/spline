@@ -1,6 +1,18 @@
 <%namespace name="lib" file="/lib.mako" />
 <%namespace name="userlib" file="/users/lib.mako" />
 
+<%def name="forum_access_level(forum)">
+% if forum.access_level != 'normal':
+<div class="forum-access-level">
+    % if forum.access_level == 'soapbox':
+    <img src="${h.static_uri('spline', 'icons/soap.png')}" alt=""> <strong>Soapbox</strong>: Regular users can't start new threads.
+    % elif forum.access_level == 'archive':
+    <img src="${h.static_uri('spline', 'icons/wooden-box.png')}" alt=""> <strong>Archive</strong>: No more posting!
+    % endif
+</div>
+% endif
+</%def>
+
 <%def name="posts(posts)">
 <div class="forum-post-container">
     % for post in posts:

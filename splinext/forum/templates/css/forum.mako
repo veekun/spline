@@ -1,4 +1,10 @@
-table.forum-list { width: 100%; }
+ul.forum-hierarchy { margin: 0.25em 1em; color: #202020; }
+ul.forum-hierarchy li { margin: 0.25em; }
+
+.forum-access-level { font-size: 0.8em; padding: 0.25em 0.625em; font-style: italic; color: #606060; }
+.forum-access-level img { vertical-align: middle; }
+
+table.forum-list { width: 100%; margin-top: 1em; }
 table.forum-list .name { text-align: left; }
 table.forum-list td.name a { display: block; font-size: 1.5em; padding: 0.33em; }
 table.forum-list .stats { width: 10em; text-align: center; }

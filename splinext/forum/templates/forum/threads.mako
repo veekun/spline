@@ -10,10 +10,21 @@
 </ul>
 </%def>
 
+<h1>Threads</h1>
+<ul class="forum-hierarchy">
+    <li>
+        In forum: <strong><img src="${h.static_uri('spline', 'icons/folders-stack.png')}" alt=""> ${c.forum.name}</strong>
+        ${forumlib.forum_access_level(c.forum)}
+    </li>
+</ul>
+
 <table class="forum-list striped-rows">
 <thead>
     <tr class="header-row">
-        <th class="name">Thread</th>
+        <th class="name">
+            <img src="${h.static_uri('spline', 'icons/folder-open-document-text.png')}" alt="">
+            Thread
+        </th>
         <th class="stats">Posts</th>
     </tr>
 </thead>
