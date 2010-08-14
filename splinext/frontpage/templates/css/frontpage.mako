@@ -12,6 +12,9 @@
 .frontpage-update .content.has-comments { padding-bottom: 3.5em; }
 .frontpage-update .comments { position: absolute; bottom: 0; left: 0; padding: 1em; }
 
+.frontpage-update table.striped-rows tr:nth-child(2n) { background: #e8e8e8; }
+.frontpage-update table.striped-rows tr:nth-child(2n+1) { background: transparent; }
+
 table.frontpage-repository { width: 100%; }
 table.frontpage-repository tr.frontpage-repository-header { background: transparent !important; }
 table.frontpage-repository th { font-size: 1.25em; padding: 0.5em 0 0; border-bottom: 1px solid #2457a0; text-align: left; font-style: italic; }
