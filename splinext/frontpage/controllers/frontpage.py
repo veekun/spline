@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from pylons import config, request, response, session, tmpl_context as c, url
@@ -7,6 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from spline.lib import helpers as h
 from spline.lib.base import BaseController, render
+from spline.model import meta
 from splinext.frontpage.sources import max_age_to_datetime
 
 log = logging.getLogger(__name__)
@@ -65,6 +67,35 @@ class FrontPageController(BaseController):
 
             if updates and len(updates) == global_limit:
                 global_max_age = updates[-1].time
+
+        # Find the oldest unseen item, to draw a divider after it.
+        # If this stays as None, the divider goes at the top
+        c.last_seen_item = None
+        # Could have a timestamp in the stash if this is a user, or in a cookie
+        # if this session has ever been logged out...
+        times = []
+        for source in (c.user.stash, request.cookies):
+            try:
+                times.append( int(source['frontpage-last-seen-time']) )
+            except (KeyError, ValueError):
+                pass
+        last_seen_time = datetime.datetime.fromtimestamp(max(times))
+
+        if last_seen_time:
+            for update in updates:
+                if update.time > last_seen_time:
+                    c.last_seen_item = update
+                else:
+                    break
+
+        # Save ~now~ as the last-seen time
+        now = datetime.datetime.now().strftime('%s')
+        if c.user:
+            c.user.stash['frontpage-last-seen-time'] = now
+            meta.Session.add(c.user)
+            meta.Session.commit()
+        else:
+            response.set_cookie('frontpage-last-seen-time', now)
 
         # Done!  Feed to template
         c.updates = updates

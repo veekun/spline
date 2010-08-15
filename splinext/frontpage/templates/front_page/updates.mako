@@ -1,8 +1,14 @@
+% if c.updates and not c.last_seen_item:
+    <hr class="frontpage-new-stuff">
+% endif
 % for update in c.updates:
-<%include file="${update.source.template}" args="update=update" />
+    <%include file="${update.source.template}" args="update=update" />
+    % if update == c.last_seen_item:
+    <hr class="frontpage-new-stuff">
+    % endif
 % endfor
 % if not c.updates:
-<p>No updates.</p>
+    <p>No updates.</p>
 % endif
 
 <p>Sources:</p>
