@@ -12,11 +12,11 @@ def add_routes_hook(map, *args, **kwargs):
     require_POST = dict(conditions=dict(method=['POST']))
 
     map.connect('/forums', controller='forum', action='forums')
-    map.connect('/forums/{forum_id}', controller='forum', action='threads')
-    map.connect('/forums/{forum_id}/threads/{thread_id}', controller='forum', action='posts')
+    map.connect(r'/forums/{forum_id:\d+}', controller='forum', action='threads')
+    map.connect(r'/forums/{forum_id:\d+}/threads/{thread_id:\d+}', controller='forum', action='posts')
 
-    map.connect('/forums/{forum_id}/write', controller='forum', action='write_thread')
-    map.connect('/forums/{forum_id}/threads/{thread_id}/write', controller='forum', action='write')
+    map.connect(r'/forums/{forum_id:\d+}/write', controller='forum', action='write_thread')
+    map.connect(r'/forums/{forum_id:\d+}/threads/{thread_id:\d+}/write', controller='forum', action='write')
 
 
 class ForumPlugin(PluginBase):
