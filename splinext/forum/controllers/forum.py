@@ -29,9 +29,8 @@ class ForumController(BaseController):
         return render('/forum/forums.mako')
 
     def threads(self, forum_id):
-        try:
-            c.forum = meta.Session.query(forum_model.Forum).get(forum_id)
-        except NoResultFound:
+        c.forum = meta.Session.query(forum_model.Forum).get(forum_id)
+        if not c.forum:
             abort(404)
 
         c.write_thread_form = WriteThreadForm()
