@@ -21,6 +21,11 @@
         <td class="name">
             <a href="${url(controller='forum', action='threads', forum_id=forum.id)}">${forum.name}</a>
             ${forumlib.forum_access_level(forum)}
+            % if forum.description:
+            <div class="forum-description">
+                ${forum.description}
+            </div>
+            % endif
         </td>
         <td class="stats">xxx</td>
         <td class="stats">xxx</th>

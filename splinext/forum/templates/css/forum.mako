@@ -4,9 +4,11 @@ ul.forum-hierarchy li { margin: 0.25em; }
 .forum-access-level { font-size: 0.8em; padding: 0.25em 0.625em; font-style: italic; color: #606060; }
 .forum-access-level img { vertical-align: middle; }
 
-table.forum-list { width: 100%; margin-top: 1em; }
+table.forum-list { width: 100%; margin-top: 0.5em; }
+table.forum-list .header-row th { vertical-align: middle; }
 table.forum-list .name { text-align: left; }
 table.forum-list td.name a { display: block; font-size: 1.5em; padding: 0.33em; }
+table.forum-list td.name .forum-description { padding: 0.33em 0.5em; color: #404040; }
 table.forum-list .stats { width: 10em; text-align: center; }
 
 .forum-post-container { }

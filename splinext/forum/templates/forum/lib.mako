@@ -13,6 +13,34 @@
 % endif
 </%def>
 
+## Prints a little hierarchy of context when viewing a thread
+<%def name="hierarchy(forum, thread=None)">
+<ul class="forum-hierarchy">
+<li>
+    % if thread:
+    <a href="${url(controller='forum', action='threads', forum_id=forum.id)}">
+    % else:
+    <strong>
+    % endif
+        <img src="${h.static_uri('spline', 'icons/folders-stack.png')}" alt=""> ${forum.name}
+    % if thread:
+    </a>
+    % else:
+    </strong>
+    % endif
+    % if forum.description:
+    &mdash; ${forum.description}
+    % endif
+    ${forum_access_level(forum)}
+</li>
+% if thread:
+<li>
+    <strong><img src="${h.static_uri('spline', 'icons/folder-open-document-text.png')}" alt=""> ${thread.subject}</strong>
+</li>
+% endif
+</ul>
+</%def>
+
 <%def name="posts(posts)">
 <div class="forum-post-container">
     % for post in posts:

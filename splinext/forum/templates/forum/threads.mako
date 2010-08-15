@@ -11,12 +11,7 @@
 </%def>
 
 <h1>Threads</h1>
-<ul class="forum-hierarchy">
-    <li>
-        In forum: <strong><img src="${h.static_uri('spline', 'icons/folders-stack.png')}" alt=""> ${c.forum.name}</strong>
-        ${forumlib.forum_access_level(c.forum)}
-    </li>
-</ul>
+${forumlib.hierarchy(c.forum)}
 
 <table class="forum-list striped-rows">
 <thead>
