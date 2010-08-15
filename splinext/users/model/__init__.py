@@ -1,5 +1,6 @@
 # encoding: utf8
 import colorsys
+import json
 from math import sin, pi
 import random
 
@@ -7,7 +8,7 @@ from sqlalchemy import Column, ForeignKey, or_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relation
 from sqlalchemy.orm.session import Session
-from sqlalchemy.types import Integer, Unicode
+from sqlalchemy.types import Integer, PickleType, Unicode
 
 from spline.model.meta import TableBase
 
@@ -16,6 +17,7 @@ class AnonymousUser(object):
 
     Tests as false and tries to respond to method calls the expected way.
     """
+    stash = {}
 
     def __nonzero__(self):
         return False
@@ -32,6 +34,7 @@ class User(TableBase):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(length=20), nullable=False)
     unique_identifier = Column(Unicode(length=32), nullable=False)
+    stash = Column(PickleType(pickler=json), nullable=False, default=dict())
 
     def __init__(self, *args, **kwargs):
         # Generate a unique hash if one isn't provided (which it shouldn't be)
