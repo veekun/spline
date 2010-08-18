@@ -16,6 +16,7 @@
 
 .frontpage-update table.striped-rows tr:nth-child(2n) { background: #e8e8e8; }
 .frontpage-update table.striped-rows tr:nth-child(2n+1) { background: transparent; }
+.frontpage-update table.striped-rows tr:hover { background: #eae1d5; }
 
 table.frontpage-repository { width: 100%; }
 table.frontpage-repository tr.frontpage-repository-header { background: transparent !important; }

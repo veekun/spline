@@ -240,7 +240,7 @@ class FeedSource(CachedSource):
 
 FrontPageGit = namedtuple('FrontPageGit', ['source', 'time', 'log', 'tag'])
 FrontPageGitCommit = namedtuple('FrontPageGitCommit',
-    ['hash', 'author', 'time', 'subject', 'repo'])
+    ['hash', 'author', 'email', 'time', 'subject', 'repo'])
 
 class GitSource(CachedSource):
     """Represents a git repository.
@@ -333,16 +333,17 @@ class GitSource(CachedSource):
                     'git',
                     '--git-dir=' + repo_path,
                     'log',
-                    '--pretty=%h%x00%an%x00%at%x00%s',
+                    '--pretty=%h%x00%an%x00%aE%x00%at%x00%s',
                     "{0}..{1}".format(since_tag, tag),
                 ]
                 proc = subprocess.Popen(git_log_args, stdout=PIPE)
                 for line in proc.stdout:
-                    hash, author, time, subject = line.strip().split('\x00')
+                    hash, author, email, time, subject = line.strip().split('\x00')
                     commits.append(
                         FrontPageGitCommit(
                             hash = hash,
                             author = author,
+                            email = email,
                             time = datetime.datetime.fromtimestamp(int(time)),
                             subject = subject,
                             repo = repo_name,

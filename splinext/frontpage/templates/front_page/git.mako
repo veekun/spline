@@ -20,7 +20,11 @@
 
             <tr>
                 <td class="hash"><a href="${update.source.gitweb}?p=${commit.repo}.git;a=commit;h=${commit.hash}">${commit.hash}</a></td>
-                <td class="author">${commit.author}</td>
+                <td class="author">
+                    <%! import hashlib %>\
+                    <img src="http://www.gravatar.com/avatar/${hashlib.md5(commit.email).hexdigest()}?s=16d=identicon" alt="">
+                    ${commit.author}
+                </td>
                 <td class="subject">${commit.subject}</td>
                 <td class="time">${commit.time}</td>
             </tr>
