@@ -4,6 +4,7 @@ implementations.
 
 from collections import namedtuple
 import datetime
+import re
 import subprocess
 from subprocess import PIPE
 from urllib2 import URLError
@@ -120,13 +121,8 @@ class CachedSource(Source):
             # Too early!
             return
 
-        try:
-            updates = self._poll(self.limit, self.max_age)
-            cache.get_cache('spline-frontpage')[self.cache_key()] = updates
-        except Exception:
-            # Hmm, polling broke.  Be conservative and don't do anything; old
-            # data is probably still OK for now
-            pass
+        updates = self._poll(self.limit, self.max_age)
+        cache.get_cache('spline-frontpage')[self.cache_key()] = updates
 
         return
 
@@ -265,13 +261,20 @@ class GitSource(CachedSource):
         Base URL to a gitweb installation, so commit ids can be linked to the
         commit proper.
 
+    ``bug_tracker``
+        URL to a bug tracker; anything matching "#xxx" will be converted into a
+        link to this.  Should contain a "{0}", which will be replaced by the
+        bug number.
+
     ``tag_pattern``
         Optional.  A shell glob pattern used to filter the tags.
     """
 
     template = '/front_page/git.mako'
 
-    def __init__(self, repo_paths, repo_names, gitweb, tag_pattern=None, **kwargs):
+    def __init__(self, repo_paths, repo_names, gitweb, bug_tracker=None,
+        tag_pattern=None, **kwargs):
+
         kwargs.setdefault('title', None)
         super(GitSource, self).__init__(**kwargs)
 
@@ -280,6 +283,7 @@ class GitSource(CachedSource):
         self.repo_names = repo_names.split()
 
         self.gitweb = gitweb
+        self.bug_tracker = bug_tracker
         self.tag_pattern = tag_pattern
 
     def _cache_key(self):
@@ -338,7 +342,15 @@ class GitSource(CachedSource):
                 ]
                 proc = subprocess.Popen(git_log_args, stdout=PIPE)
                 for line in proc.stdout:
-                    hash, author, email, time, subject = line.strip().split('\x00')
+                    hash, author, email, time, subject \
+                        = line.strip().decode('utf8').split('\x00')
+
+                    # Convert bug numbers in subject to URLs
+                    if self.bug_tracker:
+                        subject = helpers.literal(
+                            re.sub(u'#(\d+)', self._linkify_bug_number, subject)
+                        )
+
                     commits.append(
                         FrontPageGitCommit(
                             hash = hash,
@@ -359,3 +371,10 @@ class GitSource(CachedSource):
             updates.append(update)
 
         return updates
+
+    def _linkify_bug_number(self, match):
+        """Regex replace function for changing bug numbers into links."""
+        n = match.group(1)
+        bug_url = self.bug_tracker.format(match.group(1))
+        return helpers.literal(
+            u"""<a href="{0}">{1}</a>""".format(bug_url, match.group(0)))
