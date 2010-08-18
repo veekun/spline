@@ -79,9 +79,9 @@ class FrontPageController(BaseController):
                 times.append( int(source['frontpage-last-seen-time']) )
             except (KeyError, ValueError):
                 pass
-        last_seen_time = datetime.datetime.fromtimestamp(max(times))
 
-        if last_seen_time:
+        if times:
+            last_seen_time = datetime.datetime.fromtimestamp(max(times))
             for update in updates:
                 if update.time > last_seen_time:
                     c.last_seen_item = update
