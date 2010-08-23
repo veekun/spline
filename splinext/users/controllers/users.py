@@ -4,7 +4,7 @@ import unicodedata
 from wtforms import Form, ValidationError, fields, validators, widgets
 
 from pylons import config, request, response, session, tmpl_context as c, url
-from pylons.controllers.util import abort, redirect_to
+from pylons.controllers.util import abort, redirect
 from routes import request_config
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -84,6 +84,8 @@ class UsersController(BaseController):
 
         h.flash('Saved your profile.', icon='tick')
 
-        redirect_to(controller='users', action='profile',
-                    id=c.page_user.id, name=c.page_user.name,
-                    _code=303)
+        redirect(
+            url(controller='users', action='profile',
+                id=c.page_user.id, name=c.page_user.name),
+            code=303,
+        )

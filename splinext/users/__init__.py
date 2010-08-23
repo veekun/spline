@@ -1,6 +1,6 @@
 from pkg_resources import resource_filename
 
-from pylons import c, config, session
+from pylons import config, session, tmpl_context as c
 
 from spline.lib.plugin import PluginBase, PluginLink, Priority
 import spline.model.meta as meta
@@ -39,7 +39,7 @@ def add_routes_hook(map, *args, **kwargs):
     # Big-boy admin
     map.connect('/admin/users/permissions', controller='admin_users', action='permissions')
 
-def monkeypatch_user_hook(*args, **kwargs):
+def monkeypatch_user_hook(config, *args, **kwargs):
     """Hook to tell the `User` model who the root user is."""
     try:
         users_model.User._root_user_id \

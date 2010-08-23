@@ -6,7 +6,7 @@ from openid.yadis.discover import DiscoveryFailure
 from sqlalchemy.orm.exc import NoResultFound
 
 from pylons import config, request, response, session, tmpl_context as c, url
-from pylons.controllers.util import abort, redirect_to
+from pylons.controllers.util import abort, redirect
 from routes import request_config
 
 from spline.model import meta
@@ -59,7 +59,7 @@ class AccountsController(BaseController):
         return_url = url(host=host, controller='accounts', action='login_finish')
         new_url = auth_request.redirectURL(return_to=return_url,
                                            realm=protocol + '://' + host)
-        redirect_to(new_url)
+        redirect(new_url)
 
     def login_finish(self):
         """Step two of logging in; the OpenID provider redirects back here."""
@@ -72,7 +72,7 @@ class AccountsController(BaseController):
         if res.status == CANCEL:
             # I guess..  just..  back to the homepage?
             h.flash(u"""Login canceled.""", icon='user-silhouette')
-            redirect_to(url('/'))
+            redirect(url('/'))
         elif res.status != SUCCESS:
             return 'Error!  %s' % res.message
 
@@ -106,7 +106,7 @@ class AccountsController(BaseController):
         h.flash(u"""Hello, {0}!""".format(user.name),
                 icon='user')
 
-        redirect_to('/', _code=303)
+        redirect(url('/'), code=303)
 
     def logout(self):
         """Logs the user out."""
@@ -118,4 +118,4 @@ class AccountsController(BaseController):
             h.flash(u"""Logged out.""",
                     icon='user-silhouette')
 
-        redirect_to('/', _code=303)
+        redirect(url('/'), code=303)

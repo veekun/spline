@@ -1,7 +1,7 @@
 import logging
 
 from pylons import config, request, response, session, tmpl_context as c, url
-from pylons.controllers.util import abort, redirect_to
+from pylons.controllers.util import abort, redirect
 
 from spline.model import meta
 from spline.lib.base import BaseController, render
