@@ -6,13 +6,12 @@ refer to the routes manual at http://routes.groovie.org/docs/
 """
 import os
 
-from pylons import config
 from routes import Mapper
 from routes.util import controller_scan as dir_controller_scan
 
 from spline.lib.plugin.load import run_hooks
 
-def controller_scan(directory):
+def controller_scan(config, directory):
     """Looks for a controller in the plugin list, defaulting to the usual
     Routes directory scan if it isn't found."""
 
@@ -20,11 +19,12 @@ def controller_scan(directory):
     controllers.extend(dir_controller_scan(directory))
     return controllers
 
-def make_map(content_dirs=[]):
+def make_map(config, content_dirs=[]):
     """Create, configure and return the routes Mapper"""
-    map = Mapper(controller_scan=controller_scan,
-                 directory=config['pylons.paths']['controllers'],
-                 always_scan=config['debug'])
+    map = Mapper(
+        controller_scan=lambda directory: controller_scan(config, directory),
+        directory=config['pylons.paths']['controllers'],
+        always_scan=config['debug'])
     map.minimization = False
 
     # Content files get explicitly mapped so we don't have to pull any cheap
@@ -56,7 +56,7 @@ def make_map(content_dirs=[]):
     map.connect('/cron', controller='main', action='cron')
 
     # Allow plugins to map routes without the below defaults clobbering them
-    run_hooks('routes_mapping', map=map)
+    run_hooks('routes_mapping', config=config, map=map)
 
     map.connect('/', controller='main', action='index')
 

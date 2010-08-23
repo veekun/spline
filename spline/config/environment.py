@@ -3,8 +3,9 @@ import os
 import sys
 
 from mako.lookup import TemplateLookup
+import pylons
+from pylons.configuration import PylonsConfig
 from pylons.error import handle_mako_error
-from pylons import config
 from sqlalchemy import engine_from_config
 
 from spline.config.routing import make_map
@@ -18,9 +19,9 @@ from spline.model import init_model
 
 
 def load_environment(global_conf, app_conf):
-    """Configure the Pylons environment via the ``pylons.config``
-    object
-    """
+    """Configure the Pylons environment"""
+    config = PylonsConfig()
+
     # Pylons paths
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     paths = dict(root=root,
@@ -52,12 +53,13 @@ def load_environment(global_conf, app_conf):
         extra_plugins['local'] = plugin_class(config_dir)
 
     # Load plugins before routing so we have a list of controllers
-    load_plugins(paths, extra_plugins)
+    load_plugins(config, paths, extra_plugins)
     # Add our static directory
     paths['static_files']['spline'] = os.path.join(root, 'public')
 
-    config['routes.map'] = make_map(content_dirs=paths['content_files'])
-    config['pylons.app_globals'] = app_globals.Globals()
+    config['routes.map'] = make_map(config, content_dirs=paths['content_files'])
+    config['pylons.app_globals'] = app_globals.Globals(config)
+    pylons.cache._push_object(config['pylons.app_globals'].cache)
     config['pylons.h'] = spline.lib.helpers
 
     # Create the Mako TemplateLookup, with the default auto-escaping
@@ -84,5 +86,4 @@ def load_environment(global_conf, app_conf):
     # Use strict templating; none of this default-to-empty-string nonsense
     config['pylons.strict_c'] = True
 
-    # Let plugins do any final setup
-    run_hooks('after_setup')
+    return config

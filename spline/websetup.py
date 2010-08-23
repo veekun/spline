@@ -2,6 +2,7 @@
 import logging
 
 from pylons import config
+import pylons.test
 
 from spline.config.environment import load_environment
 
@@ -9,7 +10,8 @@ log = logging.getLogger(__name__)
 
 def setup_app(command, conf, vars):
     """Place any commands to setup spline here"""
-    load_environment(conf.global_conf, conf.local_conf)
+    if not pylons.test.pylonsapp:
+        load_environment(conf.global_conf, conf.local_conf)
 
     # Load the models
     from spline.model import meta

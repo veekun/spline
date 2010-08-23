@@ -5,7 +5,7 @@ Provides the BaseController class for subclassing.
 from datetime import datetime, timedelta
 
 from mako.runtime import capture
-from pylons import c, cache, config
+from pylons import cache, config, tmpl_context as c
 from pylons.controllers import WSGIController
 from pylons.templating import render_mako as render
 from sqlalchemy.interfaces import ConnectionProxy

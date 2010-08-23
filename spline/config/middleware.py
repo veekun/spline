@@ -5,12 +5,12 @@ from paste.cascade import Cascade
 from paste.registry import RegistryManager
 from paste.urlparser import StaticURLParser
 from paste.deploy.converters import asbool
-from pylons import config
 from pylons.middleware import ErrorHandler, StatusCodeRedirect
 from pylons.wsgiapp import PylonsApp
 from routes.middleware import RoutesMiddleware
 
 from spline.config.environment import load_environment
+from spline.lib.plugin.load import run_hooks
 
 class SplineApp(PylonsApp):
     def find_controller(self, controller):
@@ -18,7 +18,7 @@ class SplineApp(PylonsApp):
         falling back to the default Pylons way if it's not found."""
 
         try:
-            return config['spline.plugins.controllers'][controller]
+            return self.config['spline.plugins.controllers'][controller]
         except KeyError:
             return super(SplineApp, self).find_controller(controller)
 
@@ -81,10 +81,10 @@ def make_app(global_conf, full_stack=True, **app_conf):
 
     """
     # Configure the Pylons environment
-    load_environment(global_conf, app_conf)
+    config = load_environment(global_conf, app_conf)
 
     # The Pylons WSGI app
-    app = SplineApp()
+    app = SplineApp(config=config)
 
     # CUSTOM MIDDLEWARE HERE (filtered by error handling middlewares)
 
@@ -97,7 +97,6 @@ def make_app(global_conf, full_stack=True, **app_conf):
     # Routing/Session/Cache Middleware
     app = RoutesMiddleware(app, config['routes.map'])
     app = SessionMiddleware(app, config)
-    app = CacheMiddleware(app, config, **cache_kwargs)
 
     # Super ultra debug mode
     #from paste.translogger import TransLogger
@@ -121,4 +120,9 @@ def make_app(global_conf, full_stack=True, **app_conf):
     # server is handling this static content, remove the following 2 lines)
     static_app = SplineStaticURLParser(config['pylons.paths']['static_files'])
     app = Cascade([static_app, app])
+    app.config = config
+
+    # Let plugins do any final setup
+    run_hooks('after_setup', config=config)
+
     return app

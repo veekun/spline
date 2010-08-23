@@ -13,8 +13,8 @@ setup(
     author_email='',
     #url='',
     install_requires=[
-        "Pylons>=0.9.7",
-        "SQLAlchemy>=0.5",
+        "Pylons>=1.0",
+        "SQLAlchemy>=0.6",
         "Mako",
         "nose>=0.11",
         "WTForms>=0.6",

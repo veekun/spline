@@ -5,11 +5,11 @@ Plugins themselves should never need to touch anything in this module!
 from collections import defaultdict
 
 from pkg_resources import iter_entry_points
-from pylons import config
+import pylons
 
 import spline.model
 
-def load_plugins(paths, extra_plugins={}):
+def load_plugins(config, paths, extra_plugins={}):
     """Loads all available plugins and sticks the configuration they offer into
     `spline.plugins.*` keys in the given config dictionary.
 
@@ -121,13 +121,26 @@ def run_hooks(_spline_hook_name, *args, **kwargs):
     """Runs the hooks registered for the given name, in priority order, passing
     along all other arguments.
 
+    If the hook is called outside the normal request cycle, such as with the
+    `routes_mapping` hook, then the `config` object must be explicitly passed
+    in.
+
     Current hooks:
-    before_controller   immediately before any controller is run
-    after_setup         immediately following the Pylons environment setup
-    routes_mapping      near the end of Routes mapping, just before default
-                        routes are defined
+
+    after_setup(config)
+        immediately following the Pylons environment setup
+
+    routes_mapping(config, map)
+        near the end of Routes mapping, just before default routes are defined
+
+    before_controller(action)
+        immediately before any controller is run
+
+    after_controller()
+        immediately after any controller is run
     """
 
+    config = kwargs.get('config', pylons.config)
     all_hooks = config['spline.plugins.hooks']
 
     if not _spline_hook_name in all_hooks:
