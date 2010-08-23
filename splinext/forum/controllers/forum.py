@@ -1,7 +1,7 @@
 import logging
 
 from pylons import config, request, response, session, tmpl_context as c, url
-from pylons.controllers.util import abort, redirect_to
+from pylons.controllers.util import abort, redirect
 from routes import request_config
 from sqlalchemy.orm.exc import NoResultFound
 import wtforms
@@ -92,9 +92,11 @@ class ForumController(BaseController):
 
         # Redirect to the new thread
         h.flash("Contribution to the collective knowledge of the species successfully recorded.")
-        redirect_to(controller='forum', action='posts',
-            forum_id=forum_id, thread_id=thread.id,
-            _code=303)
+        redirect(
+            url(controller='forum', action='posts',
+                forum_id=forum_id, thread_id=thread.id),
+            code=303,
+        )
 
     def write(self, forum_id, thread_id):
         """Provides a form for posting to a thread."""
@@ -133,6 +135,8 @@ class ForumController(BaseController):
         # Redirect to the thread
         # XXX probably to the post instead; anchor?  depends on paging scheme
         h.flash('Your uniqueness has been added to our own.')
-        redirect_to(controller='forum', action='posts',
-            forum_id=forum_id, thread_id=thread_id,
-            _code=303)
+        redirect(
+            url(controller='forum', action='posts',
+                forum_id=forum_id, thread_id=thread_id),
+            code=303,
+        )
