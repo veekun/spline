@@ -56,7 +56,7 @@ class Source(object):
     The template will be passed one parameter: the update object, ``update``.
     """
 
-    def __init__(self, title, icon, link, limit=None, max_age=None):
+    def __init__(self, config, title, icon, link, limit=None, max_age=None):
         self.title = title
         self.icon = icon
         self.link = link

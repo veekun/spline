@@ -2,7 +2,7 @@ import datetime
 import logging
 
 from pylons import config, request, response, session, tmpl_context as c, url
-from pylons.controllers.util import abort, redirect_to
+from pylons.controllers.util import abort, redirect
 from routes import request_config
 from sqlalchemy.orm.exc import NoResultFound
 

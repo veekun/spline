@@ -16,9 +16,12 @@ def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
     map.connect('/', controller='frontpage', action='index')
 
-def load_sources_hook(*args, **kwargs):
+def load_sources_hook(config, *args, **kwargs):
     """Hook to load all the known sources and stuff them in config.  Run once,
     on server startup.
+
+    Frontpage hooks are also passed the `config` hash, as it's not available
+    during setup.
     """
     # Extract source definitions from config and store as source_name => config
     update_config = defaultdict(dict)
@@ -61,7 +64,7 @@ def load_sources_hook(*args, **kwargs):
         source_config.setdefault('max_age', global_max_age)
 
         # Hooks return a list of sources; combine with running list
-        sources += run_hooks(hook_name, **source_config)
+        sources += run_hooks(hook_name, config=config, **source_config)
 
     # Save the list of sources, and done
     config['spline-frontpage.sources'] = sources
