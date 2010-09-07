@@ -10,6 +10,7 @@ from wtforms import fields
 from spline.model import meta
 from spline.lib import helpers as h
 from spline.lib.base import BaseController, render
+import spline.lib.markdown
 from splinext.forum import model as forum_model
 
 log = logging.getLogger(__name__)
@@ -121,10 +122,12 @@ class ForumController(BaseController):
             .with_lockmode('update') \
             .get(c.thread.id)
 
+        source = c.write_post_form.content.data
         post = forum_model.Post(
             position = c.thread.post_count + 1,
             author_user_id = c.user.id,
-            content = c.write_post_form.content.data,
+            raw_content = source,
+            content = spline.lib.markdown.translate(source),
         )
 
         c.thread.posts.append(post)

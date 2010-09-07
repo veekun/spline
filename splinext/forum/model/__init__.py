@@ -73,6 +73,7 @@ class Post(TableBase):
     position = Column(Integer, nullable=False)
     author_user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     posted_time = Column(DateTime, nullable=False, index=True, default=datetime.now)
+    raw_content = Column(Unicode(5120), nullable=False)
     content = Column(Unicode(5120), nullable=False)
 
 Index('thread_position', Post.thread_id, Post.position, unique=True)

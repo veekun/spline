@@ -59,7 +59,7 @@
         <div class="meta">
             <time>${post.posted_time}</time>
         </div>
-        <div class="content">${post.content}</div>
+        <div class="content">${post.content | n}</div>
     </div>
     % endfor
 </div>
