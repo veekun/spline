@@ -86,4 +86,7 @@ def load_environment(global_conf, app_conf):
     # Use strict templating; none of this default-to-empty-string nonsense
     config['pylons.strict_c'] = True
 
+    # Remove any stale cron lock
+    del config['pylons.app_globals'].cache.get_cache('spline:cron')['LOCK']
+
     return config
