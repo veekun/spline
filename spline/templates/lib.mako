@@ -6,7 +6,7 @@
 <%def name="field(name, form=None, **render_args)">
 <% form = form or c.form %>\
     <dt>${form[name].label() | n}</dt>
-    <dd>${form[name](**render_args) | n}</dd>
+    <dd>${form[name](id=u'', **render_args) | n}</dd>
     % for error in form[name].errors:
     <dd class="error">${error}</dd>
     % endfor
@@ -14,7 +14,7 @@
 
 <%def name="bare_field(name, form=None, **render_args)">
 <% form = form or c.form %>\
-    ${form[name](**render_args) | n}
+    ${form[name](id=u'', **render_args) | n}
     % for error in form[name].errors:
     <p class="error">${error}</p>
     % endfor
