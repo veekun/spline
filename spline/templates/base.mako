@@ -9,7 +9,7 @@
     <script type="text/javascript" src="${h.static_uri(plugin, 'script/%s.js' % script)}"></script>
     % endfor
 </head>
-<body>
+<body class="no-js">
 <div id="header">
     <div id="title">${config['spline.site_title']}</div>
     <div id="page-name">${self.title_in_page()}</div>
