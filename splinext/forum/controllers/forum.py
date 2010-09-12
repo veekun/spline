@@ -194,10 +194,12 @@ class ForumController(BaseController):
             subject = c.write_thread_form.subject.data,
             post_count = 1,
         )
+        source = c.write_thread_form.content.data
         post = forum_model.Post(
             position = 1,
             author_user_id = c.user.id,
-            content = c.write_thread_form.content.data,
+            raw_content = source,
+            content = spline.lib.markdown.translate(source),
         )
 
         thread.posts.append(post)
