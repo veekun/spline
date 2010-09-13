@@ -18,7 +18,7 @@
             ${userlib.avatar(update.post.author, size=48)}
         </a>
     </div>
-    <div class="content has-comments">${update.post.content}</div>
+    <div class="content has-comments">${update.post.content|n}</div>
     <div class="comments">
         <a href="${url(controller='forum', action='posts', forum_id=update.post.thread.forum.id, thread_id=update.post.thread.id)}">
             ${update.post.thread.post_count - 1} comment${'' if update.post.thread.post_count == 2 else 's'}
