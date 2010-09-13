@@ -193,6 +193,11 @@ class FeedSource(CachedSource):
                 # If there be a summary, cheerfully trust that it's actually a
                 # summary
                 content = entry.summary
+            elif 'content' in entry and \
+                len(entry.content[0].value) <= self.SUMMARY_LENGTH:
+
+                # Full content is short; use as-is!
+                content = entry.entry.content[0].value
             elif 'content' in entry:
                 # Full content is way too much, especially for my giant blog posts.
                 # Cut this down to some arbitrary number of characters, then feed
