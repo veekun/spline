@@ -147,10 +147,18 @@ class ForumController(BaseController):
 
         c.write_thread_form = WriteThreadForm()
 
-        c.threads = c.forum.threads.options(
-            joinedload('last_post'),
-            joinedload('last_post.author'),
-        )
+        # nb: This will never show post-less threads.  Oh well!
+        threads_q = c.forum.threads \
+            .join(forum_model.Thread.last_post) \
+            .order_by(forum_model.Post.posted_time.desc()) \
+            .options(joinedload('last_post.author'))
+        c.num_threads = threads_q.count()
+        try:
+            c.skip = int(request.params.get('skip', 0))
+        except ValueError:
+            abort(404)
+        c.per_page = 89
+        c.threads = threads_q.offset(c.skip).limit(c.per_page)
 
         return render('/forum/threads.mako')
 
@@ -162,6 +170,17 @@ class ForumController(BaseController):
             abort(404)
 
         c.write_post_form = WritePostForm()
+
+        posts_q = c.thread.posts \
+            .order_by(forum_model.Post.position.asc()) \
+            .options(joinedload('author'))
+        c.num_posts = c.thread.post_count
+        try:
+            c.skip = int(request.params.get('skip', 0))
+        except ValueError:
+            abort(404)
+        c.per_page = 89
+        c.posts = posts_q.offset(c.skip).limit(c.per_page)
 
         return render('/forum/posts.mako')
 

@@ -57,6 +57,7 @@
             </div>
         </div>
         <div class="meta">
+            <a href="${url(controller='forum', action='posts', forum_id=post.thread.forum_id, thread_id=post.thread.id)}">#${post.position}</a>
             <time>${post.posted_time}</time>
         </div>
         <div class="content">${post.content | n}</div>

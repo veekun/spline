@@ -1,6 +1,7 @@
 <%inherit file="/base.mako" />
 <%namespace name="forumlib" file="/forum/lib.mako" />
 <%namespace name="userlib" file="/users/lib.mako" />
+<%namespace name="lib" file="/lib.mako" />
 
 <%def name="title()">${c.forum.name} - Forums</%def>
 
@@ -14,6 +15,7 @@
 <h1>Threads</h1>
 ${forumlib.hierarchy(c.forum)}
 
+${lib.pager(c.skip, c.per_page, c.num_threads, dict(controller='forum', action='threads', forum_id=c.forum.id))}
 <table class="forum-list striped-rows">
 <thead>
     <tr class="header-row">
@@ -43,5 +45,6 @@ ${forumlib.hierarchy(c.forum)}
     % endfor
 </tbody>
 </table>
+${lib.pager(c.skip, c.per_page, c.num_threads, dict(controller='forum', action='threads', forum_id=c.forum.id))}
 
 ${forumlib.write_thread_form(c.forum)}

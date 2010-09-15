@@ -1,5 +1,6 @@
 <%inherit file="/base.mako" />
 <%namespace name="forumlib" file="/forum/lib.mako" />
+<%namespace name="lib" file="/lib.mako" />
 
 <%def name="title()">${c.thread.subject} - Forums</%def>
 
@@ -17,7 +18,9 @@ ${forumlib.hierarchy(c.thread.forum, c.thread)}
 % if c.thread.post_count == 0:
 <p>Something terribly bogus has happened; this thread has no posts.</p>
 % else:
-${forumlib.posts(c.thread.posts)}
+${lib.pager(c.skip, c.per_page, c.thread.post_count, dict(controller='forum', action='posts', forum_id=c.thread.forum_id, thread_id=c.thread.id))}
+${forumlib.posts(c.posts)}
+${lib.pager(c.skip, c.per_page, c.thread.post_count, dict(controller='forum', action='posts', forum_id=c.thread.forum_id, thread_id=c.thread.id))}
 % endif
 
 ${forumlib.write_post_form(c.thread)}
