@@ -151,7 +151,10 @@ class ForumController(BaseController):
         threads_q = c.forum.threads \
             .join(forum_model.Thread.last_post) \
             .order_by(forum_model.Post.posted_time.desc()) \
-            .options(joinedload('last_post.author'))
+            .options(
+                joinedload('last_post'),
+                joinedload('last_post.author'),
+            )
         c.num_threads = threads_q.count()
         try:
             c.skip = int(request.params.get('skip', 0))
