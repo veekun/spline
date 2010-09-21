@@ -3,6 +3,8 @@ Plugins themselves should never need to touch anything in this module!
 """
 
 from collections import defaultdict
+from glob import glob
+import os, os.path
 
 from pkg_resources import iter_entry_points
 import pylons
@@ -114,6 +116,14 @@ def load_plugins(config, paths, extra_plugins={}):
     paths['templates'] = template_dirs  # already includes defaults
     paths['static_files'].update(static_dirs)
     paths['content_files'].extend(content_dirs)
+
+    # Grab the list of stylesheet templates
+    css_files = set()
+    for directory in config['spline.plugins.template_directories']:
+        for css_path in glob(os.path.join(directory, 'css', '*.mako')):
+            (whatever, css_file) = os.path.split(css_path)
+            css_files.add(css_file)
+    config['spline.plugins.stylesheets'] = css_files
 
 
 # Arg name is designed to be unlikely to collide with any arbitrary kwarg
