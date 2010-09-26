@@ -93,11 +93,16 @@ class FrontPageController(BaseController):
         if c.user:
             c.user.stash['frontpage-last-seen-time'] = now
             meta.Session.add(c.user)
-            meta.Session.commit()
         else:
             response.set_cookie('frontpage-last-seen-time', now)
 
         # Done!  Feed to template
         c.updates = updates
 
-        return render('/index.mako')
+        ret = render('/index.mako')
+
+        # Commit AFTER rendering the template!  Committing invalidates
+        # everything in the session, undoing any eagerloading that may have
+        # been done by sources
+        meta.Session.commit()
+        return ret
