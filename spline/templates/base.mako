@@ -11,7 +11,7 @@
 </head>
 <body class="no-js">
 <div id="header">
-    <div id="title">${config['spline.site_title']}</div>
+    <div id="title"><a href="${url('/')}">${config['spline.site_title']}</a></div>
     <div id="page-name">${self.title_in_page()}</div>
     <%include file="/widgets.mako" args="widget='page_header'"/>
 </div>
