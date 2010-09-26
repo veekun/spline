@@ -87,4 +87,4 @@ Thread.first_post = relation(Post, primaryjoin=and_(Post.thread_id == Thread.id,
 # XXX THIS WILL NEED TO CHANGE when posts can be deleted!  Or change what 'position' means
 Thread.last_post = relation(Post, primaryjoin=and_(Post.thread_id == Thread.id, Post.position == Thread.post_count), foreign_keys=[Post.thread_id], innerjoin=True, uselist=False, viewonly=True)
 
-Post.author = relation(users_model.User, backref='posts')
+Post.author = relation(users_model.User, backref='posts', innerjoin=True)
