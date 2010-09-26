@@ -86,6 +86,7 @@ def load_environment(global_conf, app_conf):
         sqla_proxy = spline.lib.base.SQLAQueryLogProxy()
     else:
         sqla_proxy = spline.lib.base.SQLATimerProxy()
+    config['spline._sqlalchemy_proxy'] = sqla_proxy
     engine = engine_from_config(config, 'sqlalchemy.', proxy=sqla_proxy)
     init_model(engine)
 
