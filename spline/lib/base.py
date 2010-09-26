@@ -24,11 +24,20 @@ class SQLATimerProxy(ConnectionProxy):
             return execute(cursor, statement, parameters, context)
         finally:
             try:
-                delta = datetime.now() - now
-                c.timer.sql_time += delta
                 c.timer.sql_queries += 1
             except (TypeError, AttributeError):
                 # Might happen if SQL is run before Pylons is done starting
+                pass
+
+    def execute(self, conn, execute, clauseelement, *args, **kwargs):
+        now = datetime.now()
+        try:
+            return execute(clauseelement, *args, **kwargs)
+        finally:
+            try:
+                delta = datetime.now() - now
+                c.timer.sql_time += delta
+            except (TypeError, AttributeError):
                 pass
 
 class ResponseTimer(object):
