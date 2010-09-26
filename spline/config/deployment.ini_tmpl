@@ -34,9 +34,13 @@ sqlalchemy.echo = False
 # execute malicious code after an exception is raised.
 set debug = false
 
-### DEBUGGING
+### DEBUGGING -- probably want OFF in production
 # Set this to true to get a summary of all SQL use at the bottom of every page.
 #spline.sql_debugging = true
+
+### PERFORMANCE -- probably want ON in production, off in dev
+# Turn these checks off to avoid a bunch of stat()s per request
+mako.filesystem_checks = false
 
 
 #---- Spline plugin configuration

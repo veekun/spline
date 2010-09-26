@@ -5,6 +5,7 @@ import sys
 from mako.lookup import TemplateLookup
 import pylons
 from pylons.configuration import PylonsConfig
+from paste.deploy.converters import asbool
 from pylons.error import handle_mako_error
 from sqlalchemy import engine_from_config
 
@@ -73,12 +74,15 @@ def load_environment(global_conf, app_conf):
         input_encoding='utf-8', output_encoding='utf-8',
         imports=['from webhelpers.html import escape'],
         default_filters=['escape'],
+        filesystem_checks=asbool(config.get('mako.filesystem_checks', True)),
         **module_directory)
 
     # Setup SQLAlchemy database engine
     # Proxy class is just to record query time; in debugging mode, it also
     # tracks every query
-    if config.get('spline.sql_debugging', False):
+    config['spline.sql_debugging'] = asbool(
+        config.get('spline.sql_debugging', False))
+    if config['spline.sql_debugging']:
         sqla_proxy = spline.lib.base.SQLAQueryLogProxy()
     else:
         sqla_proxy = spline.lib.base.SQLATimerProxy()
