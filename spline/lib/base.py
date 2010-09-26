@@ -161,9 +161,11 @@ class BaseController(WSGIController):
         this function wasn't involved at all, it will be set to None.)
         """
 
-        # Cache for...  ten hours?  Sure, whatever
+        # Cache for...  ten hours?  Sure, whatever.
+        # These are probably going to be pretty big, so force it to a file
+        # cache; otherwise it's easy to fill memcached's limit really quickly
         content_cache = cache.get_cache('content_cache:' + template,
-                                        expiretime=36000)
+            type='file', expiretime=36000)
 
         # XXX This is dumb.  Caches don't actually respect the 'enabled'
         # setting, so we gotta fake it.
