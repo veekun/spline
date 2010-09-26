@@ -2,7 +2,9 @@
 
 Provides the BaseController class for subclassing.
 """
+from collections import defaultdict
 from datetime import datetime, timedelta
+import traceback
 
 from mako.runtime import capture
 from pylons import cache, config, tmpl_context as c
@@ -19,7 +21,6 @@ class SQLATimerProxy(ConnectionProxy):
     """
     # props: http://techspot.zzzeek.org/?p=31
     def cursor_execute(self, execute, cursor, statement, parameters, context, executemany):
-        now = datetime.now()
         try:
             return execute(cursor, statement, parameters, context)
         finally:
@@ -40,11 +41,50 @@ class SQLATimerProxy(ConnectionProxy):
             except (TypeError, AttributeError):
                 pass
 
+class SQLAQueryLogProxy(SQLATimerProxy):
+    """Extends the above to also log a summary of exactly what queries were
+    executed, what userland code triggered them, and how long each one took.
+    """
+    def cursor_execute(self, execute, cursor, statement, parameters, context, executemany):
+        now = datetime.now()
+        try:
+            super(SQLAQueryLogProxy, self).cursor_execute(
+                execute, cursor, statement, parameters, context, executemany)
+        finally:
+            try:
+                # Find who spawned this query.  Rewind up the stack until we
+                # escape from sqlalchemy code -- including this file, which
+                # contains proxy stuff
+                caller = '(unknown)'
+                for frame_file, frame_line, frame_func, frame_code in \
+                    reversed(traceback.extract_stack()):
+
+                    if __file__.startswith(frame_file) \
+                        or '/sqlalchemy/' in frame_file:
+
+                        continue
+
+                    # OK, this is it
+                    caller = "{0}:{1} in {2}".format(
+                        frame_file, frame_line, frame_func)
+                    break
+
+                c.timer.sql_query_log[statement].append(dict(
+                    parameters=parameters,
+                    time=datetime.now() - now,
+                    caller=caller,
+                ))
+            except (TypeError, AttributeError):
+                pass
+
 class ResponseTimer(object):
     """Nearly trivial class, used for tracking how long the page took to
     create.
 
     Properties are `total_time`, `sql_time`, and `sql_queries`.
+
+    In SQL debug mode, `sql_query_log` is also populated.  Its keys are
+    queries; values are dicts of parameters, time, and caller.
     """
 
     def __init__(self):
@@ -57,6 +97,7 @@ class ResponseTimer(object):
         # spline.config.environment
         self.sql_time = timedelta()
         self.sql_queries = 0
+        self.sql_query_log = defaultdict(list)
 
     @property
     def total_time(self):

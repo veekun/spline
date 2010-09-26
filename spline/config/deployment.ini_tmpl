@@ -34,6 +34,10 @@ sqlalchemy.echo = False
 # execute malicious code after an exception is raised.
 set debug = false
 
+### DEBUGGING
+# Set this to true to get a summary of all SQL use at the bottom of every page.
+#spline.sql_debugging = true
+
 
 #---- Spline plugin configuration
 

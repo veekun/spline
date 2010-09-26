@@ -9,7 +9,7 @@ from pylons.error import handle_mako_error
 from sqlalchemy import engine_from_config
 
 from spline.config.routing import make_map
-from spline.lib.base import SQLATimerProxy
+import spline.lib.base
 import spline.lib.app_globals as app_globals
 import spline.lib.helpers
 from spline.lib.plugin import LocalPlugin
@@ -76,8 +76,13 @@ def load_environment(global_conf, app_conf):
         **module_directory)
 
     # Setup SQLAlchemy database engine
-    # Proxy class is just to record query time
-    engine = engine_from_config(config, 'sqlalchemy.', proxy=SQLATimerProxy())
+    # Proxy class is just to record query time; in debugging mode, it also
+    # tracks every query
+    if config.get('spline.sql_debugging', False):
+        sqla_proxy = spline.lib.base.SQLAQueryLogProxy()
+    else:
+        sqla_proxy = spline.lib.base.SQLATimerProxy()
+    engine = engine_from_config(config, 'sqlalchemy.', proxy=sqla_proxy)
     init_model(engine)
 
     # CONFIGURATION OPTIONS HERE (note: all config options will override
