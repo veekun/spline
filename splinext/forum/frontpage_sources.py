@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+from sqlalchemy.orm import contains_eager, joinedload
 from pylons import url
 
 from spline.model import meta
@@ -45,7 +46,12 @@ class ForumSource(Source):
 
         thread_q = meta.Session.query(forum_model.Thread) \
             .filter_by(forum_id=self.forum_id) \
-            .join(forum_model.Thread.first_post)
+            .join((forum_model.Post, forum_model.Thread.first_post)) \
+            .options(
+                contains_eager(forum_model.Thread.first_post, alias=forum_model.Post),
+                contains_eager(forum_model.Thread.first_post, forum_model.Post.thread, alias=forum_model.Thread),
+                joinedload(forum_model.Thread.first_post, forum_model.Post.author),
+            )
 
         if max_age:
             thread_q = thread_q.filter(forum_model.Post.posted_time >= max_age)

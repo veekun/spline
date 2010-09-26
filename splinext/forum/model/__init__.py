@@ -83,8 +83,8 @@ Index('thread_position', Post.thread_id, Post.position, unique=True)
 Forum.threads = relation(Thread, order_by=Thread.id.desc(), lazy='dynamic', backref='forum')
 
 Thread.posts = relation(Post, order_by=Post.position.asc(), lazy='dynamic', backref='thread')
-Thread.first_post = relation(Post, primaryjoin=and_(Post.thread_id == Thread.id, Post.position == 1), foreign_keys=[Thread.id], innerjoin=True, uselist=False)
+Thread.first_post = relation(Post, primaryjoin=and_(Post.thread_id == Thread.id, Post.position == 1), foreign_keys=[Post.thread_id], innerjoin=True, uselist=False, viewonly=True)
 # XXX THIS WILL NEED TO CHANGE when posts can be deleted!  Or change what 'position' means
-Thread.last_post = relation(Post, primaryjoin=and_(Post.thread_id == Thread.id, Post.position == Thread.post_count), foreign_keys=[Thread.id, Thread.post_count], innerjoin=True, uselist=False)
+Thread.last_post = relation(Post, primaryjoin=and_(Post.thread_id == Thread.id, Post.position == Thread.post_count), foreign_keys=[Post.thread_id], innerjoin=True, uselist=False, viewonly=True)
 
 Post.author = relation(users_model.User, backref='posts')
