@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: spline 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2010-10-01 00:53+0300\n"
+"POT-Creation-Date: 2010-10-01 15:04+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,4 +16,44 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
+
+#. Py2Format
+#: spline/templates/base-footer.mako:5
+#, python-format
+msgid "Rendered in %s seconds"
+msgstr ""
+
+#. Py3Format
+#: spline/templates/base-footer.mako:6
+msgid "{queries} SQL {q} in {time:.02f} seconds"
+msgid_plural "{queries} SQL {q} in {time:.02f} seconds"
+msgstr[0] ""
+msgstr[1] ""
+
+#: spline/templates/base-footer.mako:13
+msgid "query"
+msgid_plural "queries"
+msgstr[0] ""
+msgstr[1] ""
+
+#: spline/templates/base-footer.mako:17
+msgid "Powered by Spline"
+msgstr ""
+
+#: spline/templates/base-footer.mako:18
+msgid ""
+"Fugue icon set by <a href=\"http://www.pinvoke.com/\">Yusuke Kamiyamane</a>; "
+"country flags by <a "
+"href=\"http://www.famfamfam.com/lab/icons/flags/\">famfamfam</a>"
+msgstr ""
+
+#: spline/templates/base.mako:76
+msgid "Untitled"
+msgstr ""
+
+#. Py2Format
+#: spline/templates/error.mako:4
+#, python-format
+msgid "Error %s"
+msgstr ""
 

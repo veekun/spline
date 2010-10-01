@@ -20,6 +20,7 @@ setup(
         "WTForms>=0.6",
         'markdown',
         'lxml',
+        # 'Babel>=0.9.5',  # needed for translation work only, can do without
     ],
     setup_requires=["PasteScript==dev,>=1.6.3dev-r7326"],
     packages=find_packages(exclude=['ez_setup']),
@@ -31,10 +32,10 @@ setup(
     test_suite='nose.collector',
 
 
-    message_extractors = {'splinext': [
+    message_extractors = {'spline': [
         ('**.py', 'spline-python', None),
-        ('*/templates/**.mako', 'spline-mako', {'input_encoding': 'utf-8'}),
-        ('*/public/**', 'ignore', None)]},
+        ('**/templates/**.mako', 'spline-mako', {'input_encoding': 'utf-8'}),
+        ('**/public/**', 'ignore', None)]},
 
     paster_plugins=['PasteScript', 'Pylons'],
     entry_points="""
