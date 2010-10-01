@@ -1,5 +1,5 @@
 <%inherit file="/base.mako" />
 <%def name="title()">${c.message}</%def>
 
-<h1>Error ${c.code}</h1>
+<h1>${_('Error %s') % c.code}</h1>
 <p>${c.message}</p>

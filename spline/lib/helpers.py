@@ -44,5 +44,8 @@ def h2(title, id=None, **attrs):
     """Similar to `h1`, but for an <h2>!"""
     return h1(title, id=id, tag='h2', **attrs)
 
+def timedelta_seconds(delta):
+    return delta.seconds + delta.microseconds / 1000000.0
+
 # Import helpers as desired, or define your own, ie:
 # from webhelpers.html.tags import checkbox, password

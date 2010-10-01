@@ -1,3 +1,5 @@
+<%! from spline.lib import i18n %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -71,5 +73,5 @@
 </body>
 </html>
 
-<%def name="title()">Untitled</%def>
+<%def name="title()"><% _ = i18n.Translator(c) %>${_('Untitled')}</%def>
 <%def name="title_in_page()">${self.title()}</%def>

@@ -15,7 +15,7 @@ setup(
     install_requires=[
         "Pylons>=1.0",
         "SQLAlchemy>=0.6",
-        "Mako",
+        "Mako>=0.3.4",
         "nose>=0.11",
         "WTForms>=0.6",
         'markdown',
@@ -30,10 +30,12 @@ setup(
 
     test_suite='nose.collector',
 
-    #message_extractors = {'spline': [
-    #        ('**.py', 'python', None),
-    #        ('templates/**.mako', 'mako', None),
-    #        ('public/**', 'ignore', None)]},
+
+    message_extractors = {'splinext': [
+        ('**.py', 'spline-python', None),
+        ('*/templates/**.mako', 'spline-mako', {'input_encoding': 'utf-8'}),
+        ('*/public/**', 'ignore', None)]},
+
     paster_plugins=['PasteScript', 'Pylons'],
     entry_points="""
     [paste.app_factory]
@@ -41,5 +43,9 @@ setup(
 
     [paste.app_install]
     main = spline.installer:Installer
+
+    [babel.extractors]
+    spline-python = spline.babelplugin:extract_python
+    spline-mako = spline.babelplugin:extract_mako
     """,
 )
