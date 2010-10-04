@@ -23,7 +23,7 @@ class PluginLink(object):
     # problems with this.
     url_lookup = dict()
 
-    def __init__(self, label, url=None, children=[], collapsed=False):
+    def __init__(self, label, url=None, children=[], collapsed=False, translator_class=lambda c: unicode):
         """Arguments:
 
         `label`
@@ -39,12 +39,16 @@ class PluginLink(object):
         `collapsed`
             Whether this link appears on the menu.  It will still appear in a
             table of contents.
+
+        `translator`
+            A class used to translate the label. Will be instantiated.
         """
 
         self.label = label
         self.url = url
         self.children = children
         self.collapsed = collapsed
+        self.translator_class = translator_class
 
         # Make this tree bidirectional
         self.parent = None
