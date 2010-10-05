@@ -94,6 +94,16 @@ class BaseTranslator(object):
                 translated = prefix
         return translated
 
+class NullTranslator(object):
+    """Looks like a Translator, quacks like a Translator, but doesn't actually
+    translate
+    """
+    def __init__(*stuff, **more_stuff):
+        pass
+
+    def __call__(self, message, *stuff, **more_stuff):
+        return message
+
 class Translator(BaseTranslator):
     "Translator for Spline base templates"
     package = 'spline'

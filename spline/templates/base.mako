@@ -24,12 +24,13 @@
     <li>
         ## Instantiate the translator. XXX: Cache this?
         <%translate = link.translator_class(c)%>
+        <%label=translate(link.label, context=link.i18n_context)%>
         % if not link.label:
         <!-- nothin -->
         % elif link.url:
-        <a href="${link.url}">${translate(link.label)}</a>
+        <a href="${link.url}">${label}</a>
         % else:
-        <a>${translate(link.label)}</a>
+        <a>${label}</a>
         % endif
         % if link.children:
         ${recursive_menu(link.children)}
