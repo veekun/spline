@@ -3,24 +3,15 @@
 Consists of functions to typically be used within templates, but also
 available to Controllers. This module is available to both as 'h'.
 """
+import re
+
 from pylons import url
 from webhelpers.html import escape, HTML, literal, url_escape
 from webhelpers.html.tags import *
-from webhelpers.pylonslib import Flash
 
-import re
+import spline.lib.flash
 
-
-_flash = Flash()
-def flash(message, icon=None, **extras):
-    """Custom add-to-flash function that supports remembering an optional icon
-    per message.
-    """
-    # Messages are stored as (message, dict_of_extra_stuff)
-    if icon:
-        extras['icon'] = icon
-
-    _flash((message, extras))
+flash = spline.lib.flash.Flash()
 
 def static_uri(plugin_name, path, **url_kwargs):
     """Takes the name of a plugin and a path to a static file.

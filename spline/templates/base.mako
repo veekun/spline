@@ -40,12 +40,12 @@
 
 <%include file="/widgets.mako" args="widget='before_content'"/>
 
-<% flash = h._flash.pop_messages() %>
+<% flash = h.flash.pop_messages() %>
 % if flash:
 <ul id="flash">
-    % for message, extras in flash:
-    <li>
-        <img src="${h.static_uri('spline', "icons/{0}.png".format(extras.get('icon', 'hand-point')))}" alt="">
+    % for message in flash:
+    <li class="flash-${message.category}">
+        <img src="${h.static_uri('spline', "icons/{0}.png".format(message.icon))}" alt="">
         ${message}
     </li>
     % endfor
