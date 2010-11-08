@@ -9,14 +9,17 @@ import splinext.forum.controllers.forum
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
+    require_GET = dict(conditions=dict(method=['GET']))
     require_POST = dict(conditions=dict(method=['POST']))
 
     map.connect('/forums', controller='forum', action='forums')
     map.connect(r'/forums/{forum_id:\d+}', controller='forum', action='threads')
     map.connect(r'/forums/{forum_id:\d+}/threads/{thread_id:\d+}', controller='forum', action='posts')
 
-    map.connect(r'/forums/{forum_id:\d+}/write', controller='forum', action='write_thread')
-    map.connect(r'/forums/{forum_id:\d+}/threads/{thread_id:\d+}/write', controller='forum', action='write')
+    map.connect(r'/forums/{forum_id:\d+}/write', controller='forum', action='write_thread', **require_GET)
+    map.connect(r'/forums/{forum_id:\d+}/write', controller='forum', action='write_thread_commit', **require_POST)
+    map.connect(r'/forums/{forum_id:\d+}/threads/{thread_id:\d+}/write', controller='forum', action='write', **require_GET)
+    map.connect(r'/forums/{forum_id:\d+}/threads/{thread_id:\d+}/write', controller='forum', action='write_commit', **require_POST)
 
 
 class ForumPlugin(PluginBase):

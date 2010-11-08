@@ -4,6 +4,7 @@ import math
 
 from pylons import cache, config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
+from pylons.decorators.secure import authenticate_form
 from routes import request_config
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
@@ -200,11 +201,25 @@ class ForumController(BaseController):
             abort(404)
 
         c.write_thread_form = WriteThreadForm(request.params)
+        return render('/forum/write_thread.mako')
 
-        if request.method != 'POST' or not c.write_thread_form.validate():
-            # Failure or initial request; show the form
+    @authenticate_form
+    def write_thread_commit(self, forum_id):
+        """Posts a new thread."""
+        if not c.user.can('forum:create-thread'):
+            abort(403)
+
+        try:
+            c.forum = meta.Session.query(forum_model.Forum) \
+                .filter_by(id=forum_id).one()
+        except NoResultFound:
+            abort(404)
+
+        c.write_thread_form = WriteThreadForm(request.params)
+
+        # Reshow the form on failure
+        if not c.write_thread_form.validate():
             return render('/forum/write_thread.mako')
-
 
         # Otherwise, add the post.
         c.forum = meta.Session.query(forum_model.Forum) \
@@ -249,11 +264,25 @@ class ForumController(BaseController):
             abort(404)
 
         c.write_post_form = WritePostForm(request.params)
+        return render('/forum/write.mako')
 
-        if request.method != 'POST' or not c.write_post_form.validate():
-            # Failure or initial request; show the form
+    @authenticate_form
+    def write_commit(self, forum_id, thread_id):
+        """Post to a thread."""
+        if not c.user.can('forum:create-post'):
+            abort(403)
+
+        try:
+            c.thread = meta.Session.query(forum_model.Thread) \
+                .filter_by(id=thread_id, forum_id=forum_id).one()
+        except NoResultFound:
+            abort(404)
+
+        c.write_post_form = WritePostForm(request.params)
+
+        # Reshow the form on failure
+        if not c.write_post_form.validate():
             return render('/forum/write.mako')
-
 
         # Otherwise, add the post.
         c.thread = meta.Session.query(forum_model.Thread) \
