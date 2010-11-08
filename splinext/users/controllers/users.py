@@ -5,6 +5,7 @@ from wtforms import Form, ValidationError, fields, validators, widgets
 
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
+from pylons.decorators.secure import authenticate_form
 from routes import request_config
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -73,7 +74,24 @@ class UsersController(BaseController):
             name=c.page_user.name,
         )
 
-        if request.method != 'POST' or not c.form.validate():
+        return render('/users/profile_edit.mako')
+
+    @authenticate_form
+    def profile_edit_commit(self, id, name=None):
+        """Save profile changes."""
+        c.page_user = meta.Session.query(users_model.User).get(id)
+        if not c.page_user:
+            abort(404)
+
+        # XXX could use some real permissions
+        if c.page_user != c.user:
+            abort(403)
+
+        c.form = ProfileEditForm(request.params,
+            name=c.page_user.name,
+        )
+
+        if not c.form.validate():
             return render('/users/profile_edit.mako')
 
 

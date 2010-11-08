@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from pylons import config, request, response, session, tmpl_context as c, url
 from pylons.controllers.util import abort, redirect
+from pylons.decorators.secure import authenticate_form
 from routes import request_config
 
 from spline.model import meta
@@ -108,6 +109,7 @@ class AccountsController(BaseController):
 
         redirect(url('/'), code=303)
 
+    @authenticate_form
     def logout(self):
         """Logs the user out."""
 

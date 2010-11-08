@@ -7,7 +7,7 @@
 
 <h1>Edit ${c.page_user.name}'s profile</h1>
 
-${h.form(url.current())}
+${h.secure_form(url.current(controller='users', action='profile_edit_commit'))}
 <dl>
     <dt>Color ID</dt>
     <dd>${userlib.color_bar(c.page_user)}</dd>

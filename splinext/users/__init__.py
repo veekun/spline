@@ -12,12 +12,8 @@ from splinext.users import model as users_model
 
 def add_routes_hook(map, *args, **kwargs):
     """Hook to inject some of our behavior into the routes configuration."""
-    def id_is_numeric(environ, result):
-        try:
-            int(result['id'])
-            return True
-        except (KeyError, ValueError):
-            return False
+    require_GET = dict(conditions=dict(method=['GET']))
+    require_POST = dict(conditions=dict(method=['POST']))
 
     # Login, logout
     map.connect('/accounts/login', controller='accounts', action='login')
@@ -26,15 +22,13 @@ def add_routes_hook(map, *args, **kwargs):
     map.connect('/accounts/logout', controller='accounts', action='logout')
 
     # Self-admin
-    map.connect('/users/{id};{name}/edit', controller='users', action='profile_edit',
-        conditions=dict(function=id_is_numeric))
+    map.connect(r'/users/{id:\d+};{name}/edit', controller='users', action='profile_edit', **require_GET)
+    map.connect(r'/users/{id:\d+};{name}/edit', controller='users', action='profile_edit_commit', **require_POST)
 
     # Public user pages
     map.connect('/users', controller='users', action='list')
-    map.connect('/users/{id};{name}', controller='users', action='profile',
-        conditions=dict(function=id_is_numeric))
-    map.connect('/users/{id}', controller='users', action='profile',
-        conditions=dict(function=id_is_numeric))
+    map.connect(r'/users/{id:\d+};{name}', controller='users', action='profile')
+    map.connect(r'/users/{id:\d+}', controller='users', action='profile')
 
     # Big-boy admin
     map.connect('/admin/users/permissions', controller='admin_users', action='permissions')
