@@ -1,6 +1,7 @@
 from pkg_resources import resource_filename
 
 from pylons import session, tmpl_context as c
+from routes import url_for as url
 
 from spline.lib.plugin import PluginBase
 from spline.lib.plugin import PluginBase, PluginLink, Priority
@@ -27,6 +28,11 @@ class ForumPlugin(PluginBase):
         return dict(
             forum = splinext.forum.controllers.forum.ForumController,
         )
+
+    def links(self):
+        return [
+            PluginLink(u'Forums', url(controller='forum', action='forums')),
+        ]
 
     def hooks(self):
         hooks = [
