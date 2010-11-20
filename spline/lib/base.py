@@ -5,6 +5,7 @@ Provides the BaseController class for subclassing.
 from collections import defaultdict
 from datetime import datetime, timedelta
 import traceback
+import zlib
 
 from mako.runtime import capture
 from pylons import cache, config, tmpl_context as c
@@ -161,11 +162,9 @@ class BaseController(WSGIController):
         this function wasn't involved at all, it will be set to None.)
         """
 
-        # Cache for...  ten hours?  Sure, whatever.
-        # These are probably going to be pretty big, so force it to a file
-        # cache; otherwise it's easy to fill memcached's limit really quickly
+        # Cache for...  ten hours?  Sure, whatever
         content_cache = cache.get_cache('content_cache:' + template,
-            type='file', expiretime=36000)
+                                        expiretime=36000)
 
         # XXX This is dumb.  Caches don't actually respect the 'enabled'
         # setting, so we gotta fake it.
@@ -176,16 +175,25 @@ class BaseController(WSGIController):
             c._cache_me = skip_cache
             return render(template)
 
+        # These pages can be pretty big.  In the case of e.g. memcached, that's
+        # a lot of RAM spent on giant pages that consist half of whitespace.
+        # Solution: gzip everything.  Use level 1 for speed!
         def cache_me(context, mako_def):
             c.timer.from_cache = True
 
             def generate_page():
                 c.timer.from_cache = False
                 do_work(key)
-                return capture(context, mako_def.body)
+                return zlib.compress(
+                    capture(context, mako_def.body).encode('utf8'),
+                    1
+                )
 
-            content = content_cache.get_value(key=key, createfunc=generate_page)
-            context.write(content)
+            context.write(
+                zlib.decompress(
+                    content_cache.get_value(key=key, createfunc=generate_page)
+                ).decode('utf8')
+            )
 
         c._cache_me = cache_me
 
