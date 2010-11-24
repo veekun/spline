@@ -10,41 +10,39 @@ def extract_python(fileobj, keywords, comment_tags, options):
     return extract_from_string(fileobj.read(), keywords, comment_tags, options)
 
 def extract_mako(fileobj, keywords, comment_tags, options):
-    # XXX: Hack! When/if bug #136 in Mako is resolved this won't be necessary
-    mako.ext.babelplugin.extract_python = extract_python_strip
-    return mako.ext.babelplugin.extract(fileobj, keywords, comment_tags, options)
-
-def extract_python_strip(fileobj, keywords, comment_tags, options):
-    return extract_from_string(fileobj.read().strip(), keywords, comment_tags, options)
+    template = Template(
+            fileobj.read(),
+            input_encoding='utf-8',
+            output_encoding='utf-8',
+        )
+    # We need line numbers that correspond to the mako file.
+    # Mako does this by including "# SOURCE LINE xxx" comments in the file;
+    # use these to build a line number map
+    linenomap = []
+    lineno = 0
+    for line in template.code.splitlines():
+        emptystring, sep, number = line.strip().partition("# SOURCE LINE ")
+        if not emptystring and sep:
+            try:
+                lineno = int(number)
+            except ValueError:
+                pass
+        linenomap.append(lineno)
+    # Finally, do the actual extracting
+    fileobj = StringIO(template.code)
+    messages = extract_python(fileobj, keywords, comment_tags, options)
+    for lineno, funcname, message, comments in messages:
+        yield linenomap[lineno], funcname, message, comments
 
 def extract_from_string(string, keywords, comment_tags, options):
-    try:
-        tree = compile(
-                string,
-                filename="<input>",
-                mode='exec',
-                flags=ast.PyCF_ONLY_AST,
-                dont_inherit=True
-            )
-    except SyntaxError:
-        if not options.get('block_fragment_hack'):
-            # With Mako directives like "% for x in y:", it is possible
-            # that we get the "for x in y:" to extract from.
-            # Handle this case in a very unclean way for now.
-            if string.startswith('else') or string.startswith('elif'):
-                string = 'if True: pass\n' + string
-            elif string.startswith('except') or string.startswith('finally'):
-                string = 'try: pass\n' + string
-            string += '\n' + ' ' * 100 + 'pass'
-            options = dict(options)
-            options['block_fragment_hack'] = True
-            return extract_from_string(string, keywords, comment_tags, options)
-        else:
-            # It seems to be a legitimate syntax error after all
-            print string
-            raise
-    else:
-        return from_ast(tree, keywords, options, [])
+    tree = compile(
+            string,
+            filename="<input>",
+            mode='exec',
+            flags=ast.PyCF_ONLY_AST,
+            dont_inherit=True,
+        )
+    return from_ast(tree, keywords, options, [])
 
 def from_ast(node, keywords, options, comments):
     if isinstance(node, ast.Call):
@@ -69,7 +67,7 @@ def from_ast(node, keywords, options, comments):
                 if 'plural' in params:
                     message = (message, getstring(params.get('plural')))
                     # Cheat the function name; the extractor uses it to
-                    # distinguish between singular/plutal messages
+                    # distinguish between singular/plural messages
                     function = 'ungettext'
                 else:
                     function = 'ugettext'
