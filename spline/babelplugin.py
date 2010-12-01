@@ -18,7 +18,7 @@ def extract_mako(fileobj, keywords, comment_tags, options):
     # We need line numbers that correspond to the mako file.
     # Mako does this by including "# SOURCE LINE xxx" comments in the file;
     # use these to build a line number map
-    linenomap = []
+    linenomap = [0]
     lineno = 0
     for line in template.code.splitlines():
         emptystring, sep, number = line.strip().partition("# SOURCE LINE ")
