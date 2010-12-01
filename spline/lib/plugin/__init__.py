@@ -4,8 +4,7 @@ import os.path
 
 from pkg_resources import resource_exists, resource_filename, resource_isdir
 
-
-PluginLink = namedtuple('PluginLink', ['label', 'route'])
+from spline.lib.i18n import NullTranslator
 
 class Priority(object):
     """Enum for the order in which to load various components."""
@@ -23,7 +22,7 @@ class PluginLink(object):
     # problems with this.
     url_lookup = dict()
 
-    def __init__(self, label, url=None, children=[], collapsed=False):
+    def __init__(self, label, url=None, children=[], collapsed=False, translator_class=NullTranslator, i18n_context=None):
         """Arguments:
 
         `label`
@@ -39,12 +38,20 @@ class PluginLink(object):
         `collapsed`
             Whether this link appears on the menu.  It will still appear in a
             table of contents.
+
+        `translator`
+            A class used to translate the label. Will be instantiated.
+
+        `i18n_context`
+            I18n context, passed to the translator
         """
 
         self.label = label
         self.url = url
         self.children = children
         self.collapsed = collapsed
+        self.translator_class = translator_class
+        self.i18n_context = i18n_context
 
         # Make this tree bidirectional
         self.parent = None

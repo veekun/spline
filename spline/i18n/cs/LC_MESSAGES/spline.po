@@ -1,0 +1,65 @@
+# Czech translations for spline.
+# Copyright (C) 2010 veekun contributors
+# This file is distributed under the same license as the spline project.
+# Petr "En-Cu-Kou" Viktorin <encukou@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: spline 0.1\n"
+"Report-Msgid-Bugs-To: encukou@gmail.com\n"
+"POT-Creation-Date: 2010-09-30 23:08+0300\n"
+"PO-Revision-Date: 2010-10-01 15:09+0300\n"
+"Last-Translator: Petr \"En-Cu-Kou\" Viktorin <encukou@gmail.com>\n"
+"Language-Team: cs <encukou@gmail.com>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.5\n"
+
+#. Py2Format
+#: spline/templates/base-footer.mako:5
+#, python-format
+msgid "Rendered in %s seconds"
+msgstr "Zpracováno za %s s"
+
+#. Py3Format
+#: spline/templates/base-footer.mako:6
+msgid "{queries} SQL {q} in {time:.02f} seconds"
+msgid_plural "{queries} SQL {q} in {time:.02f} seconds"
+msgstr[0] "{queries} SQL dotaz za {time:.02f}s"
+msgstr[1] "{queries} SQL dotazy za {time:.02f}s"
+msgstr[2] "{queries} SQL dotazů za {time:.02f}s"
+
+#: spline/templates/base-footer.mako:13
+msgid "query"
+msgid_plural "queries"
+msgstr[0] "dotaz"
+msgstr[1] "dotazy"
+msgstr[2] "dotazů"
+
+#: spline/templates/base-footer.mako:17
+msgid "Powered by Spline"
+msgstr "Stránka běží na Spline"
+
+#: spline/templates/base-footer.mako:18
+msgid ""
+"Fugue icon set by <a href=\"http://www.pinvoke.com/\">Yusuke "
+"Kamiyamane</a>; country flags by <a "
+"href=\"http://www.famfamfam.com/lab/icons/flags/\">famfamfam</a>"
+msgstr ""
+"Fugue icon set od <a href=\"http://www.pinvoke.com/\">Yusuke "
+"Kamiyamane</a>; vlajky zemí z <a "
+"href=\"http://www.famfamfam.com/lab/icons/flags/\">famfamfam</a>"
+
+#: spline/templates/base.mako:76
+msgid "Untitled"
+msgstr "Beze jména"
+
+#. Py2Format
+#: spline/templates/error.mako:4
+#, python-format
+msgid "Error %s"
+msgstr "Chyba %s"
+

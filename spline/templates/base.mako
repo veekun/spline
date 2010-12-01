@@ -1,3 +1,5 @@
+<%! from spline.lib import i18n %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,12 +22,15 @@
 <ul>
   % for link in links:
     <li>
+        ## Instantiate the translator. XXX: Cache this?
+        <%translate = link.translator_class(c)%>
+        <%label=translate(link.label, context=link.i18n_context)%>
         % if not link.label:
         <!-- nothin -->
         % elif link.url:
-        <a href="${link.url}">${link.label}</a>
+        <a href="${link.url}">${label}</a>
         % else:
-        <a>${link.label}</a>
+        <a>${label}</a>
         % endif
         % if link.children:
         ${recursive_menu(link.children)}
@@ -71,5 +76,5 @@
 </body>
 </html>
 
-<%def name="title()">Untitled</%def>
+<%def name="title()"><% _ = i18n.Translator(c) %>${_('Untitled')}</%def>
 <%def name="title_in_page()">${self.title()}</%def>

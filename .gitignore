@@ -5,3 +5,4 @@
 *.ini
 *.egg-info/
 data/
+spline/i18n/*/LC_MESSAGES/spline.mo
