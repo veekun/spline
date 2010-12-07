@@ -15,7 +15,7 @@ def register_extension(extension):
     if not extension in markdown_extensions:
         markdown_extensions.append(extension)
 
-def translate(raw_text):
+def translate(raw_text, chrome=False):
     """Takes a unicode string of Markdown source.  Returns HTML."""
 
     # First translate the markdown
@@ -30,6 +30,25 @@ def translate(raw_text):
     # Make this as conservative as possible to start.  Might loosen it up a bit
     # later.
     fragment = lxml.html.fromstring(html)
+
+    if chrome:
+        # This is part of the site and is free to use whatever nonsense it wants
+        allow_tags = None
+    else:
+        # This is user content; beware!!
+        allow_tags = [
+            # Structure
+            'p', 'div', 'span', 'ul', 'ol', 'li',
+
+            # Tables
+            'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td',
+
+            # Embedding
+            'a',
+
+            # Oldschool styling
+            'strong', 'b', 'em', 'i', 's', 'u',
+        ]
 
     cleaner = lxml.html.clean.Cleaner(
         scripts = True,
@@ -47,19 +66,7 @@ def translate(raw_text):
         safe_attrs_only = True,
 
         remove_unknown_tags = False,
-        allow_tags = [
-            # Structure
-            'p', 'div', 'span', 'ul', 'ol', 'li',
-
-            # Tables
-            'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td',
-
-            # Embedding
-            'a',
-
-            # Oldschool styling
-            'strong', 'b', 'em', 'i', 's', 'u',
-        ],
+        allow_tags = allow_tags,
     )
     cleaner(fragment)
 

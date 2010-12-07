@@ -95,3 +95,12 @@
     % endfor
 </ol>
 </%def>
+
+## XXX This is gross please don't use it.
+## TODO: Clever idea: cache this by hash of the markdown source.
+<%def name="markdown()"><%
+    import mako.runtime
+    import spline.lib.markdown
+    md_source = mako.runtime.capture(context, caller.body)
+    context.write(spline.lib.markdown.translate(md_source, chrome=True))
+%></%def>
