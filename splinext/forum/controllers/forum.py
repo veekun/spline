@@ -6,7 +6,7 @@ from pylons import cache, config, request, response, session, tmpl_context as c,
 from pylons.controllers.util import abort, redirect
 from pylons.decorators.secure import authenticate_form
 from routes import request_config
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import aliased, contains_eager, joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.sql import func
 import wtforms
@@ -149,11 +149,12 @@ class ForumController(BaseController):
         c.write_thread_form = WriteThreadForm()
 
         # nb: This will never show post-less threads.  Oh well!
+        last_post = aliased(forum_model.Post)
         threads_q = c.forum.threads \
-            .join(forum_model.Thread.last_post) \
-            .order_by(forum_model.Post.posted_time.desc()) \
+            .join((last_post, forum_model.Thread.last_post)) \
+            .order_by(last_post.posted_time.desc()) \
             .options(
-                joinedload('last_post'),
+                contains_eager(forum_model.Thread.last_post, alias=last_post),
                 joinedload('last_post.author'),
             )
         c.num_threads = threads_q.count()

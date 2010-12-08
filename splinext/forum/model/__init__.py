@@ -80,7 +80,7 @@ Index('thread_position', Post.thread_id, Post.position, unique=True)
 
 
 # XXX sort by time, how?
-Forum.threads = relation(Thread, order_by=Thread.id.desc(), lazy='dynamic', backref='forum')
+Forum.threads = relation(Thread, lazy='dynamic', backref='forum')
 
 Thread.posts = relation(Post, order_by=Post.position.asc(), lazy='dynamic', backref='thread')
 Thread.first_post = relation(Post, primaryjoin=and_(Post.thread_id == Thread.id, Post.position == 1), foreign_keys=[Post.thread_id], innerjoin=True, uselist=False, viewonly=True)
