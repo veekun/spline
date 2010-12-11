@@ -1,3 +1,4 @@
+<h1>Updates</h1>
 % if c.updates and not c.last_seen_item:
     <hr class="frontpage-new-stuff">
 % endif

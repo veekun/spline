@@ -8,6 +8,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from spline.lib import helpers as h
 from spline.lib.base import BaseController, render
+from spline.lib.plugin.load import run_hooks
 from spline.model import meta
 from splinext.frontpage.sources import max_age_to_datetime
 
@@ -44,6 +45,13 @@ class FrontPageController(BaseController):
         grouping options together.  This will result in a call to:
 
             run_hooks('frontpage_updates_updatetype', opt1=val1, opt2=val2)
+
+        Plugins may also respond to the `frontpage_extras` hook with other
+        interesting things to put on the front page.  There's no way to
+        customize the order of these extras or which appear and which don't, at
+        the moment.  Such hooks should return an object with at least a
+        `template` attribute; the template will be called with the object
+        passed in as its `obj` argument.
 
         Local plugins can override the fairly simple index.mako template to
         customize the front page layout.
@@ -98,6 +106,11 @@ class FrontPageController(BaseController):
 
         # Done!  Feed to template
         c.updates = updates
+
+        # Hook for non-update interesting things to put on the front page.
+        # This hook should return objects with a 'template' attribute, and
+        # whatever else they need
+        c.extras = run_hooks('frontpage_extras')
 
         ret = render('/index.mako')
 
