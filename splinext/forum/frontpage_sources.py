@@ -1,15 +1,14 @@
 from collections import namedtuple
+import datetime
 
 from sqlalchemy.orm import contains_eager, joinedload
-from pylons import url
+from sqlalchemy.sql import func
+from pylons import tmpl_context as c, url
 
 from spline.model import meta
 
 from splinext.forum import model as forum_model
 from splinext.frontpage.sources import Source
-
-def frontpage_hook(limit, max_age, forum_id):
-    """Hook to return recent news for the front page."""
 
 FrontPageThread = namedtuple('FrontPageThread', ['source', 'time', 'post'])
 class ForumSource(Source):
@@ -70,3 +69,33 @@ class ForumSource(Source):
             updates.append(update)
 
         return updates
+
+FrontPageActivity = namedtuple('FrontPageActivity', ['template', 'threads'])
+def forum_activity(*args, **kwargs):
+    """Show recently-active threads on the front page.
+
+    Note that this isn't the most recent X threads; it's threads that are more
+    recent than X, sorted by their activity since X.
+    """
+    # XXX this should be configurable probably
+    cutoff = datetime.datetime.now() - datetime.timedelta(days=7)
+
+    # TODO some sort of dropoff here idk
+    active_threads_subq = meta.Session.query(
+        forum_model.Post.thread_id.label('thread_id'),
+        func.count('*').label('ranking'),
+    ) \
+        .filter(forum_model.Post.posted_time >= cutoff) \
+        .group_by(forum_model.Post.thread_id) \
+        .subquery()
+
+    threads_q = meta.Session.query(forum_model.Thread) \
+        .join((active_threads_subq,
+            active_threads_subq.c.thread_id == forum_model.Thread.id)) \
+        .order_by(active_threads_subq.c.ranking.desc()) \
+        .limit(10)
+
+    return FrontPageActivity(
+        template='/forum/front_page_activity.mako',
+        threads=threads_q.all(),
+    )

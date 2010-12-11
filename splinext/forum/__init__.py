@@ -41,9 +41,11 @@ class ForumPlugin(PluginBase):
 
         # frontpage plugin may or may not be installed
         try:
-            from splinext.forum.frontpage_sources import ForumSource
+            from splinext.forum.frontpage_sources import ForumSource, forum_activity
             hooks.append(
                 ('frontpage_updates_forum', Priority.NORMAL, ForumSource))
+            hooks.append(
+                ('frontpage_extras', Priority.NORMAL, forum_activity))
         except ImportError:
             pass
 
