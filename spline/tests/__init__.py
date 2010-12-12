@@ -31,7 +31,7 @@ from routes.util import URLGenerator
 
 import pylons.test
 
-__all__ = ['environ', 'url', 'TestController']
+__all__ = ['environ', 'url', 'TestController', 'SplineTest']
 
 # Invoke websetup with the current config file
 SetupCommand('setup-app').run([pylons.test.pylonsapp.config['__file__']])
@@ -46,3 +46,12 @@ class TestController(TestCase):
         self.app = TestApp(wsgiapp)
         url._push_object(URLGenerator(config['routes.map'], environ))
         TestCase.__init__(self, *args, **kwargs)
+
+class SplineTest(object):
+    """Test class that doesn't inherit from anything in unittest."""
+
+    def __init__(self):
+        wsgiapp = pylons.test.pylonsapp
+        config = wsgiapp.config
+        self.app = TestApp(wsgiapp)
+        url._push_object(URLGenerator(config['routes.map'], environ))
