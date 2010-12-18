@@ -28,6 +28,19 @@ def static_uri(plugin_name, path, **url_kwargs):
     root_url = url('/', **url_kwargs)
     return "%sstatic/%s/%s" % (root_url, plugin_name, path)
 
+def sanitize_id(text):
+    # See: http://www.w3.org/TR/html4/types.html#type-id
+    # Do unicode decomposition to separate diacritics
+    decomp = unicodedata.normalize('NFD', unicode(text.lower()))
+    # Remove diacritics (category M*)
+    id = ''.join(c for c in decomp if unicodedata.category(c)[0] != 'M')
+    # Convert all non-ID characters to hyphen-minuses
+    id = re.sub('[^-A-Za-z0-9_:.]', '-', id)
+    # Add "x" to the beginning if title starts with non-letter
+    if not re.match('[a-zA-Z]', id[0]):
+        id = 'x' + id
+    return id
+
 def h1(title, id=None, tag='h1', **attrs):
     """Returns an <h1> tag that links to itself.
 
@@ -37,16 +50,7 @@ def h1(title, id=None, tag='h1', **attrs):
     into something appropriate.
     """
     if not id:
-        # See: http://www.w3.org/TR/html4/types.html#type-id
-        # Do unicode decomposition to separate diacritics
-        decomp = unicodedata.normalize('NFD', unicode(title.lower()))
-        # Remove diacritics (category M*)
-        id = ''.join(c for c in decomp if unicodedata.category(c)[0] != 'M')
-        # Convert all non-ID characters to hyphen-minuses
-        id = re.sub('[^-A-Za-z0-9_:.]', '-', id)
-        # Add "x" to the beginning if title starts with non-letter
-        if not re.match('[a-zA-Z]', id[0]):
-            id = 'x' + id
+        id = sanitize_id(title)
 
     link = HTML.a(title, href='#' + id, class_='subtle')
     return HTML.tag(tag, link, id=id, **attrs)
