@@ -17,6 +17,7 @@ from spline.lib.plugin import LocalPlugin
 from spline.lib.plugin.load import load_plugins, run_hooks
 import spline.model
 from spline.model import init_model
+import spline.lib.makoext
 
 
 def load_environment(global_conf, app_conf):
@@ -75,6 +76,7 @@ def load_environment(global_conf, app_conf):
         imports=['from webhelpers.html import escape'],
         default_filters=['escape'],
         filesystem_checks=asbool(config.get('mako.filesystem_checks', True)),
+        preprocessor=spline.lib.makoext.i18n_preprocessor,
         **module_directory)
 
     # Setup SQLAlchemy database engine

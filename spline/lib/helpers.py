@@ -67,5 +67,11 @@ def keysort(d, key):
     keys.sort(key=key)
     return ((key, d[key]) for key in keys)
 
+def get_translator(get_i18n, c):
+    try:
+        return get_i18n().Translator(c)
+    except (KeyError, AttributeError):
+        return None
+
 # Import helpers as desired, or define your own, ie:
 # from webhelpers.html.tags import checkbox, password
