@@ -4,7 +4,7 @@ from StringIO import StringIO
 from mako.template import Template
 import mako.ext.babelplugin
 
-_args = "message plural n context".split()
+_args = "message plural n context comment".split()
 
 def extract_python(fileobj, keywords, comment_tags, options):
     return extract_from_string(fileobj.read(), keywords, comment_tags, options)
@@ -61,6 +61,7 @@ def from_ast(node, keywords, options, comments):
                     params[name] = None
             message = getstring(params.get('message'))
             context = getstring(params.get('context'))
+            comment = getstring(params.get('comment'))
             if message:
                 if context:
                     message = context + '|' + message
@@ -71,6 +72,12 @@ def from_ast(node, keywords, options, comments):
                     function = 'ungettext'
                 else:
                     function = 'ugettext'
+                actual_comments = comments
+                if comment:
+                    try:
+                        actual_comments += comment.splitlines()
+                    except AttributeError:
+                        actual_comments += comment
                 yield node.lineno, function, message, comments
     child_comments = []
     if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Mod):

@@ -75,7 +75,7 @@ class BaseTranslator(object):
         else:
             self.translation = translations
 
-    def __call__(self, message, plural=None, n=None, context=None):
+    def __call__(self, message, plural=None, n=None, context=None, comment=None):
         if context:
             prefix = context + u'|'
         else:
