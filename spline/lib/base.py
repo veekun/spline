@@ -6,11 +6,13 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 import traceback
 import zlib
+import cPickle as pickle
 
 from mako.runtime import capture
 from pylons import cache, config, tmpl_context as c
 from pylons.controllers import WSGIController
 from pylons.templating import render_mako as render
+from pylons.i18n.translation import get_lang
 from sqlalchemy.interfaces import ConnectionProxy
 
 from spline.lib.plugin.load import run_hooks
@@ -128,6 +130,11 @@ class BaseController(WSGIController):
         # WSGIController.__call__ dispatches to the Controller method
         # the request is routed to. This routing information is
         # available in environ['pylons.routes_dict']
+
+        c.lang = get_lang()
+        if c.lang:
+            c.lang = c.lang[0]
+
         try:
             return WSGIController.__call__(self, environ, start_response)
         finally:
@@ -162,6 +169,8 @@ class BaseController(WSGIController):
         this function wasn't involved at all, it will be set to None.)
         """
 
+        real_key = pickle.dumps((key, c.lang))
+
         # Cache for...  ten hours?  Sure, whatever
         content_cache = cache.get_cache('content_cache:' + template,
                                         expiretime=36000)
@@ -191,11 +200,10 @@ class BaseController(WSGIController):
 
             context.write(
                 zlib.decompress(
-                    content_cache.get_value(key=key, createfunc=generate_page)
+                    content_cache.get_value(key=real_key, createfunc=generate_page)
                 ).decode('utf8')
             )
 
         c._cache_me = cache_me
 
         return render(template)
-
