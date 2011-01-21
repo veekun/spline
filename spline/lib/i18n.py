@@ -56,6 +56,7 @@ class BaseTranslator(object):
     dir = 'i18n'
 
     def __init__(self, context=None, languages=None, translations=None):
+        self.context = context
         if translations is None:
             if languages is None:
                 languages = get_lang()
