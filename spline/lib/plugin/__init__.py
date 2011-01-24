@@ -4,7 +4,7 @@ import os.path
 
 from pkg_resources import resource_exists, resource_filename, resource_isdir
 
-from spline.lib.i18n import NullTranslator
+from spline.i18n import NullTranslator
 
 class Priority(object):
     """Enum for the order in which to load various components."""

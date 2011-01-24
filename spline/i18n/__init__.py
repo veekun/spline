@@ -3,6 +3,7 @@
 import gettext
 import pkg_resources
 from pylons.i18n.translation import get_lang
+import spline.i18n.en
 
 class BaseTranslator(object):
     """Spline's translator. A callable object indended to be used as _.
@@ -62,6 +63,7 @@ class BaseTranslator(object):
                 languages = get_lang()
             if languages is None:
                 self.translation = gettext.NullTranslations()
+                self.language = None
             else:
                 directory = pkg_resources.resource_filename(
                         self.package,
@@ -73,8 +75,10 @@ class BaseTranslator(object):
                         localedir=directory,
                         languages=languages,
                     )
+                self.language = languages[0]
         else:
             self.translation = translations
+            self.language = None
 
     def __call__(self, message, plural=None, n=None, context=None, comment=None):
         if context:
@@ -93,7 +97,20 @@ class BaseTranslator(object):
             prefix, sep, translated = translated.partition('|')
             if not sep:
                 translated = prefix
-        return translated
+        return handle_template(translated, self.language)
+
+def handle_template(message, language='en'):
+    if message and message[0] == '@':
+        if language:
+            try:
+                mod = __import__('spline.i18n.' + language, fromlist='Template')
+                Template = mod.Template
+            except (ImportError, AttributeError), e:
+                Template = spline.i18n.en.Template
+        else:
+            Template = spline.i18n.en.Template
+        return Template(message[1:])
+    return message
 
 class NullTranslator(object):
     """Looks like a Translator, quacks like a Translator, but doesn't actually
@@ -103,7 +120,7 @@ class NullTranslator(object):
         pass
 
     def __call__(self, message, *stuff, **more_stuff):
-        return message
+        return handle_template(message)
 
 class Translator(BaseTranslator):
     "Translator for Spline base templates"

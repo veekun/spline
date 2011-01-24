@@ -1,9 +1,13 @@
+# Encoding: UTF-8
+
 from nose.tools import assert_equal
 import gettext
 from babel.messages.extract import extract_python
 from StringIO import StringIO
 from spline import babelplugin
-from spline.lib import i18n
+from spline import i18n
+import spline.i18n.en
+import spline.i18n.cs
 
 class TestTranslations(object):
     """gettext-like Translations class. Reports what gets called instead of
@@ -152,3 +156,36 @@ def test_extraction_mako():
         ]
     args = (StringIO(input), ['_'], [], {})
     check_generator(func, args, output)
+
+
+# Translation tests #
+
+def test_en():
+    for templ, args, kwargs, out in [
+            ('{a:*w} {w}', [], dict(a='a', w='apple'), 'an apple'),
+            ('{a:*0} {0}', ['apple'], dict(a='a'), 'an apple'),
+            ('{1:*0} {0}', ['apple', 'a'], dict(), 'an apple'),
+            ('{=a:*0} {0}', ['apple'], dict(), 'an apple'),
+            ('{=a:*0} {0}', ['pear'], dict(), 'a pear'),
+        ]:
+        def test():
+            assert_equal(i18n.en.Template(templ).format(*args, **kwargs), out)
+        test.description = templ
+        yield test
+
+def test_cs():
+    for templ, args, kwargs, out in [
+            ('{0}', [u'mladý'], dict(), u'mladý'),
+            ('{0:case=2}', [u'mladý'], dict(), u'mladého'),
+            ('{0:case=3}', [u'mladý'], dict(), u'mladému'),
+            ('{0:number=pl}', [u'mladý'], dict(), u'mladí'),
+            ('{0:gender=f}', [u'mladý'], dict(), u'mladá'),
+            ('{0}', [u'jarní'], dict(), u'jarní'),
+            ('{0:case=2}', [u'jarní'], dict(), u'jarního'),
+            ('{0:gender=n,case=2,number=pl}', [u'jarní'], dict(), u'jarních'),
+            ('{0:case=2}', [u'jarní a mladý'], dict(), u'jarního a mladého'),
+        ]:
+        def test():
+            assert_equal(i18n.cs.Template(templ).format(*args, **kwargs), out)
+        test.description = templ
+        yield test
