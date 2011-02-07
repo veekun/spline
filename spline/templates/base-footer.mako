@@ -1,5 +1,4 @@
-<%! from spline.lib import i18n %>
-<% _ = i18n.Translator() %>
+<%! from spline import i18n %>
 
 <div id="footer-timer">
     ${_('Rendered in %s seconds') % h.timedelta_seconds(c.timer.total_time)} <br>

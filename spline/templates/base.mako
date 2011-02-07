@@ -1,4 +1,4 @@
-<%! from spline.lib import i18n %>
+<%! from spline import i18n %>
 
 <!DOCTYPE html>
 <html>
