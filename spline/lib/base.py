@@ -6,7 +6,6 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 import traceback
 import zlib
-import cPickle as pickle
 
 from mako.runtime import capture
 from pylons import cache, config, tmpl_context as c
@@ -169,7 +168,8 @@ class BaseController(WSGIController):
         this function wasn't involved at all, it will be set to None.)
         """
 
-        real_key = pickle.dumps((key, c.lang))
+        # Content needs to be cached per-language
+        key = "{0}/{1}".format(key, c.lang)
 
         # Cache for...  ten hours?  Sure, whatever
         content_cache = cache.get_cache('content_cache:' + template,
@@ -200,7 +200,7 @@ class BaseController(WSGIController):
 
             context.write(
                 zlib.decompress(
-                    content_cache.get_value(key=real_key, createfunc=generate_page)
+                    content_cache.get_value(key=key, createfunc=generate_page)
                 ).decode('utf8')
             )
 
