@@ -169,7 +169,7 @@ class BaseController(WSGIController):
         """
 
         # Content needs to be cached per-language
-        key = "{0}/{1}".format(key, c.lang)
+        key = u"{0}/{1}".format(key, c.lang)
 
         # Cache for...  ten hours?  Sure, whatever
         content_cache = cache.get_cache('content_cache:' + template,
