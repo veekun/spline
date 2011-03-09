@@ -10,6 +10,7 @@ from pylons import url
 from webhelpers.html import escape, HTML, literal, url_escape
 from webhelpers.html.tags import *
 from webhelpers.pylonslib.secure_form import secure_form
+from webhelpers.util import update_params
 
 import unicodedata
 import re

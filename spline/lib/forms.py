@@ -56,16 +56,28 @@ class DuplicateField(fields.Field):
         self.data = []
 
         num_entries = max(self.min_entries, len(valuelist), len(data))
+        subsubfields = []
         for i in range(num_entries):
             subfield = self.unbound_field.bind(form=None, prefix=self._prefix,
                                                name=self.short_name, id="{0}-{1}".format(self.id, i))
 
+            if i == 0:
+                if formdata and hasattr(subfield, 'subfield_names'):
+                    subsubfields = list(subfield.subfield_names)
+
+            # See if there's any form data to give the field
+            fakedata = FakeMultiDict()
             if i < len(valuelist):
-                subfield.process(FakeMultiDict( [(subfield.name, [ valuelist[i] ])] ))
-            elif i < len(data):
-                subfield.process(FakeMultiDict(), data[i])
+                fakedata[subfield.name] = [valuelist[i]]
+            for name in subsubfields:
+                subvaluelist = formdata.getlist(name)
+                if i < len(subvaluelist):
+                    fakedata[name] = [subvaluelist[i]]
+
+            if i < len(data):
+                subfield.process(fakedata, data[i])
             else:
-                subfield.process(FakeMultiDict())
+                subfield.process(fakedata)
 
             if subfield.data != subfield.default:
                 self.data.append(subfield.data)
