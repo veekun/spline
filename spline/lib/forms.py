@@ -79,7 +79,7 @@ class DuplicateField(fields.Field):
             else:
                 subfield.process(fakedata)
 
-            if subfield.data != subfield.default:
+            if subfield.default or subfield.data != subfield.default:
                 self.data.append(subfield.data)
 
             self.entries.append(subfield)
