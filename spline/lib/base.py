@@ -61,8 +61,9 @@ class SQLAQueryLogProxy(SQLATimerProxy):
                 for frame_file, frame_line, frame_func, frame_code in \
                     reversed(traceback.extract_stack()):
 
-                    if __file__.startswith(frame_file) \
-                        or '/sqlalchemy/' in frame_file:
+                    if __file__.startswith(frame_file) or \
+                        '/sqlalchemy/' in frame_file or \
+                        'db/multilang.py' in frame_file:
 
                         continue
 
