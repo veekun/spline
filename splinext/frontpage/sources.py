@@ -97,6 +97,8 @@ class CachedSource(Source):
     and the results are cached.  ``poll`` then returns the contents of the
     cache.
 
+    ``_poll`` may return None, in which case the cache will be left unchanged.
+
     You must define a ``_cache_key`` method that returns a key uniquely
     identifying this object.  Your key will be combined with the class name, so
     it only needs to be unique for that source, not globally.
@@ -122,7 +124,8 @@ class CachedSource(Source):
             return
 
         updates = self._poll(self.limit, self.max_age)
-        cache.get_cache('spline-frontpage')[self.cache_key()] = updates
+        if updates is not None:
+            cache.get_cache('spline-frontpage')[self.cache_key()] = updates
 
         return
 
@@ -166,7 +169,7 @@ class FeedSource(CachedSource):
         if feed.bozo and isinstance(feed.bozo_exception, URLError):
             # Feed is DOWN.  Bail here; otherwise, old entries might be lost
             # just because, say, Bulbanews is down yet again
-            raise feed.bozo_exception
+            return None
 
         if not self.title:
             self.title = feed.feed.title
