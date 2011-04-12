@@ -20,6 +20,7 @@ setup(
         "WTForms>=0.6",
         'markdown',
         'lxml',
+        'webhelpers>=1.2',
         # 'Babel>=0.9.5',  # needed for translation work only, can do without
     ],
     setup_requires=["PasteScript==dev,>=1.6.3dev-r7326"],
