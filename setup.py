@@ -54,5 +54,6 @@ setup(
     [spline.plugins]
     users = splinext.users:UsersPlugin
     forum = splinext.forum:ForumPlugin
+    frontpage = splinext.frontpage:FrontPagePlugin
     """,
 )
