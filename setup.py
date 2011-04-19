@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 try:
     from setuptools import setup, find_packages
 except ImportError:
@@ -53,5 +54,6 @@ setup(
 
     [spline.plugins]
     users = splinext.users:UsersPlugin
+    forum = splinext.forum:ForumPlugin
     """,
 )
