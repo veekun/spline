@@ -2,6 +2,9 @@
 from collections import namedtuple
 import os.path
 
+from pylons import config
+from routes import url_for
+from pylons.i18n.translation import get_lang
 from pkg_resources import resource_exists, resource_filename, resource_isdir
 
 from spline.i18n import NullTranslator
@@ -42,7 +45,7 @@ class PluginLink(object):
         """
 
         self.label = label
-        self.url = url
+        self._url = url
         self.children = children
         self.collapsed = collapsed
         self.translator_class = translator_class
@@ -53,6 +56,19 @@ class PluginLink(object):
         for child in children:
             child.parent = self
 
+    @property
+    def url(self):
+        if self._url:
+            try:
+                lang = get_lang()[0]
+            except TypeError:
+                return self._url
+            else:
+                map = config['routes.map'].match(self._url)
+                map['_lang'] = get_lang()[0]
+                return url_for(**map)
+        else:
+            return None
 
 class PluginBase(object):
     """Base object for spline plugins.  Plugins should advertise a subclass of

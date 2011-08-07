@@ -6,10 +6,52 @@ refer to the routes manual at http://routes.groovie.org/docs/
 """
 import os
 
-from routes import Mapper
+from routes import Mapper, url_for
 from routes.util import controller_scan as dir_controller_scan
+from pylons.i18n.translation import get_lang
 
 from spline.lib.plugin.load import run_hooks
+from spline.i18n import Translator
+
+class I18nMapper(Mapper):
+    def connect(self, *args, **kwargs):
+        translator_class = kwargs.pop('i18n_class', None)
+        super(I18nMapper, self).connect(*args, **kwargs)
+        for lang in Translator.available_languages():
+            try:
+                name, url = args
+            except ValueError:
+                name = None
+                (url, ) = args
+            if translator_class:
+                url_parts = ['', lang]
+                _ = translator_class(languages=[lang])
+                for part in url.split('/'):
+                    if not part:
+                        pass
+                    elif '{' not in part and '*' not in part:
+                        url_parts.append(_(part, context='url').encode('utf-8'))
+                    else:
+                        url_parts.append(part)
+                translated_url = '/'.join(url_parts)
+            else:
+                translated_url = '/' + lang + url
+            kwargs['_lang'] = lang
+            if name:
+                name = lang + '!!' + name
+            super(I18nMapper, self).connect(name, translated_url, **kwargs)
+
+    def generate(self, route=None, *args, **kwargs):
+        try:
+            lang = get_lang()[0]
+        except TypeError:
+            lang = None
+        else:
+            kwargs.setdefault('_lang', lang)
+        if route and lang and '!!' not in route.name:
+            return url_for(kwargs['_lang'] + '!!' + route.name, *args, **kwargs)
+        else:
+            return super(I18nMapper, self).generate(*args, **kwargs)
 
 def controller_scan(config, directory):
     """Looks for a controller in the plugin list, defaulting to the usual
@@ -21,7 +63,7 @@ def controller_scan(config, directory):
 
 def make_map(config, content_dirs=[]):
     """Create, configure and return the routes Mapper"""
-    map = Mapper(
+    map = I18nMapper(
         controller_scan=lambda directory: controller_scan(config, directory),
         directory=config['pylons.paths']['controllers'],
         always_scan=config['debug'])

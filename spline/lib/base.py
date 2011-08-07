@@ -11,7 +11,7 @@ from mako.runtime import capture
 from pylons import cache, config, tmpl_context as c
 from pylons.controllers import WSGIController
 from pylons.templating import render_mako as render
-from pylons.i18n.translation import get_lang
+from pylons.i18n.translation import set_lang
 from sqlalchemy.interfaces import ConnectionProxy
 
 from spline.lib.plugin.load import run_hooks
@@ -131,9 +131,9 @@ class BaseController(WSGIController):
         # the request is routed to. This routing information is
         # available in environ['pylons.routes_dict']
 
-        c.lang = get_lang()
+        c.lang = environ['pylons.routes_dict'].get('_lang')
         if c.lang:
-            c.lang = c.lang[0]
+            set_lang(c.lang)
 
         try:
             return WSGIController.__call__(self, environ, start_response)
