@@ -1,5 +1,6 @@
 # Encoding: UTF-8
 
+import os
 import gettext
 import pkg_resources
 from pylons.i18n.translation import get_lang
@@ -55,6 +56,21 @@ class BaseTranslator(object):
     Unicode (u*gettext) is used everywhere.
     """
     dir = 'i18n'
+
+    @classmethod
+    def available_languages(cls):
+        """Return the available languages (not including the default)
+        """
+        available_languages = []
+        for root, dirs, files in os.walk(pkg_resources.resource_filename(
+                        cls.package,
+                        cls.dir
+                    )):
+            components = root.split(os.sep)
+            if components[-1] == 'LC_MESSAGES':
+                if cls.package + '.po' in files:
+                    available_languages.append(components[-2])
+        return available_languages
 
     def __init__(self, context=None, languages=None, translations=None):
         self.context = context
