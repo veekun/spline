@@ -79,6 +79,15 @@ def from_ast(node, keywords, options, comments):
                     except AttributeError:
                         actual_comments += comment
                 yield node.lineno, function, message, comments
+        elif funcname == 'connect':
+            for arg in node.args:
+                if isinstance(arg, ast.Str):
+                    url = getstring(arg)
+                    if url.startswith('/'):
+                        for part in url.split('/'):
+                            if part and '{' not in part and '*' not in part:
+                                part = 'url|' + part
+                                yield node.lineno, 'ugettext', part, []
     child_comments = []
     if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Mod):
         child_comments.append('Py2Format')
