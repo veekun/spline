@@ -86,12 +86,17 @@ class BaseTranslator(object):
                         self.dir
                     )
                 gettext.bindtextdomain(self.package, directory)
-                self.translation = gettext.translation(
-                        domain=getattr(self, 'domain', self.package),
-                        localedir=directory,
-                        languages=languages,
-                    )
-                self.language = languages[0]
+                try:
+                    self.translation = gettext.translation(
+                            domain=getattr(self, 'domain', self.package),
+                            localedir=directory,
+                            languages=languages,
+                        )
+                except IOError:
+                    self.translation = gettext.NullTranslations()
+                    self.language = None
+                else:
+                    self.language = languages[0]
         else:
             self.translation = translations
             self.language = None
