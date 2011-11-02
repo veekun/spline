@@ -112,7 +112,11 @@ class ForumController(BaseController):
         c.forum_volume = forum_cache.get_value(
             key='forum_volume', createfunc=get_forum_volume)
 
-        c.max_volume = max(c.forum_volume.itervalues()) or 1
+        try:
+            c.max_volume = max(c.forum_volume.itervalues()) or 1
+        except ValueError:
+            # Empty database
+            c.max_volume = 1
 
         # Need to know the last post for each forum, in realtime
         c.last_post = {}
