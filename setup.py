@@ -1,9 +1,4 @@
-try:
-    from setuptools import setup, find_packages
-except ImportError:
-    from ez_setup import use_setuptools
-    use_setuptools()
-    from setuptools import setup, find_packages
+from setuptools import setup, find_packages
 
 setup(
     name='spline',
@@ -25,7 +20,7 @@ setup(
         # 'Babel>=0.9.5',  # needed for translation work only, can do without
     ],
     setup_requires=["PasteScript==dev,>=1.6.3dev-r7326"],
-    packages=find_packages(exclude=['ez_setup']),
+    packages=find_packages(),
 
     include_package_data=True,
     package_data={'spline': ['i18n/*/LC_MESSAGES/*.mo']},
