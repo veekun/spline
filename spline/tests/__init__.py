@@ -19,7 +19,10 @@ def new_writeln(self, arg=None):
         else:
             self.write(arg)
     self.write('\n')
-unittest._WritelnDecorator.writeln = new_writeln
+try:
+    unittest._WritelnDecorator.writeln = new_writeln
+except AttributeError:
+    unittest.runner._WritelnDecorator.writeln = new_writeln
 
 from unittest import TestCase
 
