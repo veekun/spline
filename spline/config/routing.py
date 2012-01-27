@@ -35,6 +35,8 @@ class I18nMapper(Mapper):
                         url_parts.append(part)
                 translated_url = '/'.join(url_parts)
             else:
+                if url == '/':
+                    url = ''
                 translated_url = '/' + lang + url
             kwargs['_lang'] = lang
             if name:
