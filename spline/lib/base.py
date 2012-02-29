@@ -118,7 +118,7 @@ class BaseController(WSGIController):
 
         c.links = config['spline.plugins.links']
         c.javascripts = [
-            ('spline', 'lib/jquery-1.3.2.min'),
+            ('spline', 'lib/jquery-1.7.1.min'),
             ('spline', 'lib/jquery.cookies-2.2.0.min'),
             ('spline', 'lib/jquery.ui-1.8.4.min'),
             ('spline', 'core'),
