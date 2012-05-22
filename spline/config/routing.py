@@ -6,10 +6,80 @@ refer to the routes manual at http://routes.groovie.org/docs/
 """
 import os
 
-from routes import Mapper
+from routes import Mapper, url_for
 from routes.util import controller_scan as dir_controller_scan
+from pylons.i18n.translation import get_lang
 
 from spline.lib.plugin.load import run_hooks
+from spline.i18n import Translator
+
+class I18nMapper(Mapper):
+    def connect(self, *args, **kwargs):
+        """Create and connect a new Route to the Mapper.
+
+        In addition to the what Routes' connect() does, this method will
+        connect language-specific routes for all languages available to Spline.
+
+        For named routes, the language-specific entries will have the language
+        identifier prepended, separated from the name by '!!'.
+        The string '!!' shouldn't be used in route names for other purposes.
+        """
+        translator_class = kwargs.pop('i18n_class', None)
+        # Connect the URL for the default language
+        super(I18nMapper, self).connect(*args, **kwargs)
+
+        # Now connect for all available languages
+        for lang in Translator.available_languages():
+            try:
+                name, url = args
+            except ValueError:
+                name = None
+                [url] = args
+            if translator_class:
+                # The first part of the URL is '/<lang>'
+                url_parts = ['', lang]
+                # Chop the URL into parts, translate each one individually,
+                # then join them back together
+                _ = translator_class(languages=[lang])
+                for part in url.split('/'):
+                    if not part:
+                        pass
+                    elif '{' not in part and '*' not in part:
+                        # Skip variable parts
+                        url_parts.append(_(part, context='url').encode('utf-8'))
+                    else:
+                        url_parts.append(part)
+                translated_url = '/'.join(url_parts)
+            else:
+                if url == '/':
+                    # Make bare language prefix work (e.g. '/de')
+                    url = ''
+                translated_url = '/' + lang + url
+            # Add the `_lang` kwarg, and the language tag if we're named
+            kwargs['_lang'] = lang
+            if name:
+                name = lang + '!!' + name
+            # And we're off!
+            super(I18nMapper, self).connect(name, translated_url, **kwargs)
+
+    def generate(self, route=None, *args, **kwargs):
+        """Generate a route from a set of keywords
+
+        If the `_lang` argument is not given, the curent language used for it.
+
+        For a named route, a language tag will be prepended to the name
+        depending on the `_lang` arument.
+        """
+        try:
+            lang = get_lang()[0]
+        except TypeError:
+            lang = None
+        else:
+            kwargs.setdefault('_lang', lang)
+        if route and lang and '!!' not in route.name:
+            return url_for(kwargs['_lang'] + '!!' + route.name, *args, **kwargs)
+        else:
+            return super(I18nMapper, self).generate(*args, **kwargs)
 
 def controller_scan(config, directory):
     """Looks for a controller in the plugin list, defaulting to the usual
@@ -21,7 +91,7 @@ def controller_scan(config, directory):
 
 def make_map(config, content_dirs=[]):
     """Create, configure and return the routes Mapper"""
-    map = Mapper(
+    map = I18nMapper(
         controller_scan=lambda directory: controller_scan(config, directory),
         directory=config['pylons.paths']['controllers'],
         always_scan=config['debug'])

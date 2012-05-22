@@ -3,13 +3,12 @@
 <div id="footer-timer">
     ${_('Rendered in %s seconds') % h.timedelta_seconds(c.timer.total_time)} <br>
     ${_(
-            '{queries} SQL {q} in {time:.02f} seconds',
-            '{queries} SQL {q} in {time:.02f} seconds',
+            '{queries} SQL query in {time:.02f} seconds',
+            '{queries} SQL queries in {time:.02f} seconds',
             n=c.timer.sql_queries
         ).format(
             queries=c.timer.sql_queries,
             time=h.timedelta_seconds(c.timer.sql_time),
-            q=_('query', 'queries', n=c.timer.sql_queries),
         )}
 </div>
 
