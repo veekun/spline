@@ -2,7 +2,6 @@
 
 Provides the BaseController class for subclassing.
 """
-from collections import defaultdict
 from datetime import datetime, timedelta
 import traceback
 import zlib
@@ -13,6 +12,7 @@ from pylons.controllers import WSGIController
 from pylons.templating import render_mako as render
 from pylons.i18n.translation import set_lang
 from sqlalchemy import event
+from sqlalchemy.util import OrderedDict
 
 from spline.lib.plugin.load import run_hooks
 from spline.model import meta
@@ -77,7 +77,8 @@ def attach_query_log(listener):
             # Might happen if SQL is run before Pylons is done starting
             return
 
-        c.timer.sql_query_log[statement].append(dict(
+        timer.add_log(dict(
+            statement=statement,
             parameters=parameters,
             time=datetime.now() - start_time,
             caller=_get_caller(),
@@ -107,7 +108,7 @@ class ResponseTimer(object):
         # spline.config.environment
         self.sql_time = timedelta()
         self.sql_queries = 0
-        self.sql_query_log = defaultdict(list)
+        self.sql_query_log = OrderedDict()
 
     @property
     def total_time(self):
@@ -116,6 +117,8 @@ class ResponseTimer(object):
             self._total_time = datetime.now() - self._start_time
         return self._total_time
 
+    def add_log(self, log):
+        self.sql_query_log.setdefault(log['statement'], []).append(log)
 
 class BaseController(WSGIController):
 
