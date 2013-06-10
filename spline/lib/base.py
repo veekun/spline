@@ -12,73 +12,79 @@ from pylons import cache, config, tmpl_context as c
 from pylons.controllers import WSGIController
 from pylons.templating import render_mako as render
 from pylons.i18n.translation import set_lang
-from sqlalchemy.interfaces import ConnectionProxy
+from sqlalchemy import event
 
 from spline.lib.plugin.load import run_hooks
 from spline.model import meta
 
+# Backwards compatibility
+class SQLATimerProxy(object):
+    pass
 
-class SQLATimerProxy(ConnectionProxy):
-    """Simple connection proxy that keeps track of total time spent querying.
+def _get_caller():
+    # Find who spawned this query.  Rewind up the stack until we
+    # escape from sqlalchemy code -- including this file, which
+    # contains proxy stuff
+    for frame_file, frame_line, frame_func, frame_code in \
+        reversed(traceback.extract_stack()):
+
+        if __file__.startswith(frame_file) or \
+            '/sqlalchemy/' in frame_file or \
+            'db/multilang.py' in frame_file:
+
+            continue
+
+        # OK, this is it
+        return "{0}:{1} in {2}".format(frame_file, frame_line, frame_func)
+    return '(unknown)'
+
+# http://www.sqlalchemy.org/trac/wiki/UsageRecipes/Profiling
+def attach_timer(listener):
+    """Attach events to an Engine to keep track of total time spent querying.
     """
-    # props: http://techspot.zzzeek.org/?p=31
-    def cursor_execute(self, execute, cursor, statement, parameters, context, executemany):
-        try:
-            return execute(cursor, statement, parameters, context)
-        finally:
-            try:
-                c.timer.sql_queries += 1
-            except (TypeError, AttributeError):
-                # Might happen if SQL is run before Pylons is done starting
-                pass
+    def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        context.spline_start_time = datetime.now()
 
-    def execute(self, conn, execute, clauseelement, *args, **kwargs):
-        now = datetime.now()
-        try:
-            return execute(clauseelement, *args, **kwargs)
-        finally:
-            try:
-                delta = datetime.now() - now
-                c.timer.sql_time += delta
-            except (TypeError, AttributeError):
-                pass
+    def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        start_time = context.spline_start_time
 
-class SQLAQueryLogProxy(SQLATimerProxy):
-    """Extends the above to also log a summary of exactly what queries were
+        try:
+            timer = c.timer
+        except (TypeError, AttributeError):
+            # Might happen if SQL is run before Pylons is done starting
+            return
+
+        delta = datetime.now() - start_time
+        timer.sql_time += delta
+        timer.sql_queries += 1
+
+    event.listen(listener, 'before_cursor_execute', before_cursor_execute)
+    event.listen(listener, 'after_cursor_execute', after_cursor_execute)
+
+def attach_query_log(listener):
+    """Attach events to an Engine to log a summary of exactly what queries were
     executed, what userland code triggered them, and how long each one took.
     """
-    def cursor_execute(self, execute, cursor, statement, parameters, context, executemany):
-        now = datetime.now()
+    def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        context.spline_start_time2 = datetime.now()
+
+    def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        start_time = context.spline_start_time2
+
         try:
-            super(SQLAQueryLogProxy, self).cursor_execute(
-                execute, cursor, statement, parameters, context, executemany)
-        finally:
-            try:
-                # Find who spawned this query.  Rewind up the stack until we
-                # escape from sqlalchemy code -- including this file, which
-                # contains proxy stuff
-                caller = '(unknown)'
-                for frame_file, frame_line, frame_func, frame_code in \
-                    reversed(traceback.extract_stack()):
+            timer = c.timer
+        except (TypeError, AttributeError):
+            # Might happen if SQL is run before Pylons is done starting
+            return
 
-                    if __file__.startswith(frame_file) or \
-                        '/sqlalchemy/' in frame_file or \
-                        'db/multilang.py' in frame_file:
+        c.timer.sql_query_log[statement].append(dict(
+            parameters=parameters,
+            time=datetime.now() - start_time,
+            caller=_get_caller(),
+        ))
 
-                        continue
-
-                    # OK, this is it
-                    caller = "{0}:{1} in {2}".format(
-                        frame_file, frame_line, frame_func)
-                    break
-
-                c.timer.sql_query_log[statement].append(dict(
-                    parameters=parameters,
-                    time=datetime.now() - now,
-                    caller=caller,
-                ))
-            except (TypeError, AttributeError):
-                pass
+    event.listen(listener, 'before_cursor_execute', before_cursor_execute)
+    event.listen(listener, 'after_cursor_execute', after_cursor_execute)
 
 class ResponseTimer(object):
     """Nearly trivial class, used for tracking how long the page took to
@@ -96,7 +102,7 @@ class ResponseTimer(object):
 
         self.from_cache = None
 
-        # SQLAlchemy will add to these using the above proxy class; see
+        # SQLAlchemy will add to these using the above event listeners; see
         # spline.config.environment
         self.sql_time = timedelta()
         self.sql_queries = 0

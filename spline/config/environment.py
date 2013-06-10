@@ -8,6 +8,7 @@ from pylons.configuration import PylonsConfig
 from paste.deploy.converters import asbool
 from pylons.error import handle_mako_error
 from sqlalchemy import engine_from_config
+from sqlalchemy.engine import Engine
 
 from spline.config.routing import make_map
 import spline.lib.base
@@ -79,18 +80,21 @@ def load_environment(global_conf, app_conf):
         preprocessor=spline.lib.makoext.i18n_preprocessor,
         **module_directory)
 
-    # Setup SQLAlchemy database engine
-    # Proxy class is just to record query time; in debugging mode, it also
-    # tracks every query
+    # Set up SQLAlchemy database engine
+    engine = engine_from_config(config, 'sqlalchemy.')
+    init_model(engine)
+
+    # Set up our timer events
+    # We attach them globally to the Engine class so we can automatically track
+    # any other database connections used by the app. *coughpokedexcough*
     config['spline.sql_debugging'] = asbool(
         config.get('spline.sql_debugging', False))
+    spline.lib.base.attach_timer(Engine)
     if config['spline.sql_debugging']:
-        sqla_proxy = spline.lib.base.SQLAQueryLogProxy()
-    else:
-        sqla_proxy = spline.lib.base.SQLATimerProxy()
-    config['spline._sqlalchemy_proxy'] = sqla_proxy
-    engine = engine_from_config(config, 'sqlalchemy.', proxy=sqla_proxy)
-    init_model(engine)
+        spline.lib.base.attach_query_log(Engine)
+
+    # Backwards compatibility
+    config['spline._sqlalchemy_proxy'] = None
 
     # CONFIGURATION OPTIONS HERE (note: all config options will override
     # any Pylons config options)
