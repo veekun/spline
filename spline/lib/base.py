@@ -81,6 +81,7 @@ def attach_query_log(listener):
             parameters=parameters,
             time=datetime.now() - start_time,
             caller=_get_caller(),
+            rowcount=cursor.rowcount,
         ))
 
     event.listen(listener, 'before_cursor_execute', before_cursor_execute)
