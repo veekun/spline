@@ -4,6 +4,7 @@
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import fields, widgets, ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
+from wtforms.fields.core import UnboundField
 
 
 class FakeMultiDict(dict):
@@ -26,7 +27,7 @@ class DuplicateField(fields.Field):
             raise TypeError('DuplicateField does not accept any filters. Instead, define them on the enclosed field.')
         if validators:
             raise TypeError('DuplicateField does not accept any validators. Instead, define them on the enclosed field.')
-        assert isinstance(unbound_field, fields.UnboundField), 'Field must be unbound, not a field class'
+        assert isinstance(unbound_field, UnboundField), 'Field must be unbound, not a field class'
 
         self.unbound_field = unbound_field
         self.min_entries = min_entries
