@@ -4,7 +4,10 @@
 from sqlalchemy.orm.exc import NoResultFound
 from wtforms import fields, widgets, ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
-from wtforms.fields.core import UnboundField
+try:
+    from wtforms.fields.core import UnboundField
+except ImportError:
+    from wtforms.fields import UnboundField
 
 
 class FakeMultiDict(dict):
@@ -20,7 +23,7 @@ class DuplicateField(fields.Field):
     """
     widget = widgets.ListWidget()
 
-    def __init__(self, unbound_field, label=u'', validators=None, min_entries=0,
+    def __init__(self, unbound_field, label=None, validators=None, min_entries=0,
                  max_entries=None, default=[], **kwargs):
         super(DuplicateField, self).__init__(label, validators, default=default, **kwargs)
         if self.filters:
@@ -155,7 +158,7 @@ class QueryTextField(fields.TextField):
 
      `get_pk` is not required.
     """
-    def __init__(self, label=u'', validators=None, query_factory=None,
+    def __init__(self, label=None, validators=None, query_factory=None,
                  get_label=None, allow_blank=False, **kwargs):
         super(QueryTextField, self).__init__(label, validators, **kwargs)
         if not query_factory:
