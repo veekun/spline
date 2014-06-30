@@ -14,7 +14,10 @@
 
 <%def name="bare_field(name, form=None, **render_args)">
 <% form = form or c.form %>\
-${literal_field(form[name])}
+    ${form[name](id=u'', **render_args) | n}
+    % for error in form[name].errors:
+    <p class="error">${error}</p>
+    % endfor
 </%def>
 
 <%def name="literal_field(field, **render_args)">
