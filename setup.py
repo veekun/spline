@@ -19,7 +19,7 @@ setup(
         'webhelpers>=1.2',
         # 'Babel>=0.9.5',  # needed for translation work only, can do without
     ],
-    setup_requires=["PasteScript==dev,>=1.6.3dev-r7326"],
+    setup_requires=["PasteScript"],
     packages=find_packages(),
 
     include_package_data=True,
