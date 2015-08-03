@@ -8,7 +8,7 @@ setup(
     author_email='',
     #url='',
     install_requires=[
-        "Pylons>=1.0",
+        "Pylons>=1.0.1",
         "SQLAlchemy>=0.6",
         "Mako>=0.3.4",
         "nose>=0.11",
