@@ -46,6 +46,9 @@ setup(
     spline-python = spline.babelplugin:extract_python
     spline-mako = spline.babelplugin:extract_mako
 
+    [nose.plugins]
+    pylons = pylons.test:PylonsPlugin
+
     [spline.plugins]
     users = splinext.users:UsersPlugin
     forum = splinext.forum:ForumPlugin
