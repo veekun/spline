@@ -139,7 +139,7 @@ class QueryCheckboxSelectMultipleField(QuerySelectMultipleField):
     option_widget = widgets.CheckboxInput()
 
 
-class QueryTextField(fields.TextField):
+class QueryTextField(fields.StringField):
     """
     Represents a database object entered in a freeform text field.  Works
     similarly to `QuerySelectField`, but avoids the problem of scaling a

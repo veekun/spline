@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 
 
 class ProfileEditForm(Form):
-    name = fields.TextField(u'Display name', [validators.Required()])
+    name = fields.StringField(u'Display name', [validators.Required()])
 
     def validate_name(form, field):
         if not 1 < len(field.data) <= 20:

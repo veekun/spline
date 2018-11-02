@@ -93,7 +93,7 @@ class WritePostForm(wtforms.Form):
     content = fields.TextAreaField('Content')
 
 class WriteThreadForm(WritePostForm):
-    subject = fields.TextField('Subject')
+    subject = fields.StringField('Subject')
 
 class ForumController(BaseController):
 

@@ -12,7 +12,7 @@ setup(
         "SQLAlchemy>=0.6",
         "Mako>=0.3.4",
         "nose>=0.11",
-        "WTForms>=0.6",
+        "WTForms>=1.0",
         'markdown',
         'lxml',
         'python-openid',
