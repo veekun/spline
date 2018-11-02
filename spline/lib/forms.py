@@ -36,6 +36,7 @@ class DuplicateField(fields.Field):
         self.min_entries = min_entries
         self.max_entries = max_entries
         self._prefix = kwargs.get('_prefix', '')
+        self._form = kwargs.get('_form', None)
 
     def process(self, formdata, data=fields._unset_value):
         if data is fields._unset_value or not data:
@@ -62,7 +63,7 @@ class DuplicateField(fields.Field):
         num_entries = max(self.min_entries, len(valuelist), len(data))
         subsubfields = []
         for i in range(num_entries):
-            subfield = self.unbound_field.bind(form=None, prefix=self._prefix,
+            subfield = self.unbound_field.bind(form=self._form, prefix=self._prefix,
                                                name=self.short_name, id="{0}-{1}".format(self.id, i))
 
             if i == 0:
