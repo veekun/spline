@@ -123,5 +123,6 @@ class Flash(object):
         """
         from pylons import session
         messages = session.pop(self.session_key, [])
-        session.save()
+        if messages:
+            session.save()
         return [Message(**m) for m in messages]
