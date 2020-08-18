@@ -252,7 +252,8 @@ class LocalPlugin(object):
                 # Directory: add every file inside
                 for widget_file in os.listdir(candidate_path):
                     widget_path = os.path.join(candidate_path, widget_file)
-                    if os.path.isfile(widget_path):
+                    if widget_file.endswith(".mako") and not widget_file.startswith(".") \
+                            and os.path.isfile(widget_path):
                         basename, whatever = os.path.splitext(widget_file)
                         widgets.append( (
                             candidate_file,
